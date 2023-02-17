@@ -4,8 +4,9 @@
   tasks:
     - name: Start Lab VMs
       ansible.builtin.include_role:
-        name: lab_hypervisor_tasks
-        tasks_from: main.yml
+        name: roles/lab_hypervisor_tasks
+        tasks_from: start_vm.yml
+      tags: start
 
 
 
