@@ -27,6 +27,19 @@
   tags:
    - stop
 
+- name: Reset Nodes to Base Snapshot
+  command: /usr/sbin/qm rollback "{{ item }}" preupgrade
+  loop:
+    - 102
+    - 106
+    - 107
+    - 108
+    - 110
+    - 111
+    - 112
+    - 114
+  tags:
+   - rollback
 
 
 
@@ -34,48 +47,7 @@
 
 
 
-#    - name: Reset Nodes to Snapshot
-#       command: /usr/sbin/qm rollback "{{ item }}" preupgrade
-#       loop:
-#        - 102
-#        - 106
-#        - 107
-#        - 108
-#        - 110
-#        - 111
-#        - 112
-#        - 113
-#       tags:
-#        - rollback
-#
-#     - name: Start Nodes
-#       command: /usr/sbin/qm start "{{ item }}"
-#       loop:
-#        - 102
-#        - 106
-#        - 107
-#        - 108
-#        - 110
-#        - 111
-#        - 112
-#        - 113
-#       tags:
-#        - start
-#
-#     - name: Stop  Nodes
-#       command: /usr/sbin/qm stop "{{ item }}"
-#       loop:
-#        - 102
-#        - 106
-#        - 107
-#        - 108
-#        - 110
-#        - 111
-#        - 112
-#        - 113
-#       tags:
-#        - stop
-#
+
 #    - name: Take Snapshot
 #       command: /usr/sbin/qm snapshot "{{ item }}" preupgrade
 #       loop:
