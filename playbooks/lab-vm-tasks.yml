@@ -5,8 +5,14 @@
     - name: Start Lab VMs
       ansible.builtin.include_role:
         name: roles/lab_hypervisor_tasks
-        tasks_from: start_vm.yml
+        tasks_from: main
       tags: start
+
+    - name: Stop Lab VMs
+      ansible.builtin.include_role:
+        name: roles/lab_hypervisor_tasks
+        tasks_from: main
+      tags: stop
 
 
 

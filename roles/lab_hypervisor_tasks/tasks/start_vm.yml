@@ -1,6 +1,6 @@
 ---
 - name: Start Nodes
-  shell: /usr/sbin/qa start "{{ item }}"
+  shell: /usr/sbin/qm start "{{ item }}"
   loop:
     - 102
     - 106

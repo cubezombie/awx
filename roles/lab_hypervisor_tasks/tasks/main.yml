@@ -1,6 +1,6 @@
 ---
 - name: Start Nodes
-  command: /usr/sbin/qa start "{{ item }}"
+  command: /usr/sbin/qm start "{{ item }}"
   loop:
     - 102
     - 106
@@ -10,9 +10,22 @@
     - 111
     - 112
     - 113
- # tags:
- #   -start
+  tags:
+    - start
 
+- name: Stop Nodes
+  command: /usr/sbin/qm stop "{{ item }}"
+  loop:
+    - 102
+    - 106
+    - 107
+    - 108
+    - 110
+    - 111
+    - 112
+    - 113
+  tags:
+   - stop
 
 
 
