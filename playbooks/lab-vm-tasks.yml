@@ -1,0 +1,48 @@
+---
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: Start Lab VMs
+      ansible.builtin.include_role:
+        name: lab_hypervisor_tasks
+        tasks_from: main.yml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#---
+#- hosts: all
+#  gather_facts: no
+#  become: yes
+#  tasks:
+#     - name: Start Lab VMs
+#       include_role:
+#         name: lab_hypervisor_tasks
+#         tasks_from: Start Nodes
+
+#     - name: Stop Lab VMs
+#       include_role:
+#         name: lab_hypervisor_tasks
+#         tasks_from: Stop Nodes
+
+#     - name: Reset VMs to Snapshot
+#       include_role:
+#         name: lab_hypervisory_tasks
+#         tasks_from: Reset Nodes to Snapshot
+
