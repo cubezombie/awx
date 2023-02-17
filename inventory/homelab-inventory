@@ -6,7 +6,7 @@ rhel8-02
 rhel9-01
 rhel9-02
 
-exclude
+[exclude]
 rhel6-01
 rhel6-02
 
