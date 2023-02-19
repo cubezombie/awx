@@ -21,3 +21,7 @@ rhel8-02
 [rhel9]
 rhel9-01
 rhel9-02
+
+[pihole]
+ubuntu-pihole
+fedora-pihole
