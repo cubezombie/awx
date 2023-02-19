@@ -20,9 +20,15 @@
         tasks_from: main
       tags: rollback
 
+    - name: Find Lab VMs Across Cluster
+      ansible.builtin.include_role:
+        name: roles/lab_hypervisor_tasks
+      tags: findnode
 
-
-
+    - name: Print return information from the previous task
+      ansible.builtin.debug:
+        var: findnode
+        verbosity: 2
 
 
 

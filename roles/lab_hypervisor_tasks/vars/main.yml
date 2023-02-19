@@ -1,2 +1,10 @@
 ---
+rhel6-01: 102
+rhel6-02: 106
+rhel7-01: 107
+rhel7-02: 108
+rhel8-01: 110
+rhel8-02: 111
+rhel9-01: 112
+rhel9-02: 113
 # vars file for lab-hypervisor-tasks

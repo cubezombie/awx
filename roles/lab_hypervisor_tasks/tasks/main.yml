@@ -41,7 +41,10 @@
   tags:
    - rollback
 
-
+- name: Find Nodes Across Cluster
+  command: pvesh get /cluster/resources --type vm
+  register: vm_node_list
+  tags: findnode
 
 
 
