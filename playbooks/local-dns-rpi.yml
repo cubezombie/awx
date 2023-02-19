@@ -2,6 +2,6 @@
 - hosts: pihole 
   gather_facts: false
   roles: 
-    - lab_pihole_dns
-#    - ../roles/lab_pihole_dns
+#    - lab_pihole_dns
+    - roles/lab_pihole_dns
 

@@ -1,5 +1,5 @@
 ---
-rpi_src_path: /roles/lab_pihole_dns/files/rpi-local-dns
+rpi_src_path: /root/repos/awx/roles/lab_pihole_dns/files/rpi-local-dns
 rpi_dst_path: /etc/pihole/custom.list
 rpi_file_owner: root
 rpi_file_group: root

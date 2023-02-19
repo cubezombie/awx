@@ -2,8 +2,8 @@
   - name: Update Local DNS on Piholes
     register: dns_update
     copy:
-      src: "../roles/lab_pihole_dns/files/rpi_local_dns"
-      #src: "{{ rpi_src_path }}"
+      #src: "./lab_pihole_dns/files/rpi_local_dns"
+      src: "{{ rpi_src_path }}"
       dest: "{{ rpi_dst_path }}"
       owner: "{{ rpi_file_owner }}"
       group: "{{ rpi_file_group }}"
