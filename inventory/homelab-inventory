@@ -25,3 +25,6 @@ rhel9-02
 [pihole]
 ubuntu-pihole
 fedora-pihole
+
+[lab_host_hypervisor]
+lab-beast01
