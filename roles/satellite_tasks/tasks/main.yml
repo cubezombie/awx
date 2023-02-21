@@ -1,2 +1,12 @@
 ---
-# tasks file for satellite_tasks
+- setup:
+    filter: "{{ item }}"
+  loop:
+    - 'ansible_distribution*'
+    - 'ansible_hostname'
+
+- name: register_to_satellite
+  command: "subscription-manager register --org={{ org }} --activationkey={{ reg_key6 }}"
+#  ignore_errors: true
+   tags:
+     - register
