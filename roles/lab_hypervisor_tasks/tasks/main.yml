@@ -41,6 +41,21 @@
   tags:
    - rollback
 
+- name: Shutdown Nodes
+  command: /usr/sbin/qm shutdown "{{ item }}"
+  loop:
+    - 102
+    - 106
+    - 107
+    - 108
+    - 110
+    - 111
+    - 112
+    - 113
+  tags:
+   - shutdown
+
+
 - name: Find Nodes Across Cluster
   command: pvesh get /cluster/resources --type vm
   register: vm_node_list

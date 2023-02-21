@@ -14,6 +14,11 @@
         tasks_from: main
       tags: stop
 
+    - name: Shutdown Lab VMs
+      ansible.builtin.include_role:
+        name: roles/lab_hypervisor_tasks
+      tags: shutdown
+
     - name: Rollback Lab VMs
       ansible.builtin.include_role:
         name: roles/lab_hypervisor_tasks
@@ -29,20 +34,4 @@
       ansible.builtin.debug:
         var: findnode
         verbosity: 2
-
-
-
-
-
-
-
-
-
-
-
-
-#     - name: Reset VMs to Snapshot
-#       include_role:
-#         name: lab_hypervisory_tasks
-#         tasks_from: Reset Nodes to Snapshot
 
