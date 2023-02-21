@@ -5,13 +5,11 @@
     - name: Start Lab VMs
       ansible.builtin.include_role:
         name: roles/lab_hypervisor_tasks
-        tasks_from: main
       tags: start
 
     - name: Stop Lab VMs
       ansible.builtin.include_role:
         name: roles/lab_hypervisor_tasks
-        tasks_from: main
       tags: stop
 
     - name: Shutdown Lab VMs
@@ -22,7 +20,6 @@
     - name: Rollback Lab VMs
       ansible.builtin.include_role:
         name: roles/lab_hypervisor_tasks
-        tasks_from: main
       tags: rollback
 
     - name: Find Lab VMs Across Cluster
