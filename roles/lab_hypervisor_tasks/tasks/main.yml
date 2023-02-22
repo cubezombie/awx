@@ -61,22 +61,3 @@
   register: vm_node_list
   tags: findnode
 
-
-
-
-
-
-#    - name: Take Snapshot
-#       command: /usr/sbin/qm snapshot "{{ item }}" preupgrade
-#       loop:
-#        - 102
-#        - 106
-#        - 107
-#        - 108
-#        - 110
-#        - 111
-#        - 112
-#        - 113
-#       tags:
-#        - snapshot
-

@@ -3,13 +3,11 @@
   gather_facts: false
   become: true
   tasks:
-#    - name: Get Distro and Hostname
-#      ansible.builtin.include_role:
-#        name: roles/satellite_tasks
-#        tasks_from: setup
-
-    - name: Register VMs to Satellite
-      ansible.builtin.include_role:
+    - name: Get Distro and Hostname
+      ansible.builtin.import_role:
         name: roles/satellite_tasks
-        tasks_from: register_to_satellite
-    
+        
+    - name: Register VMs to Satellite
+      ansible.builtin.import_role:
+        name: roles/satellite_tasks
+

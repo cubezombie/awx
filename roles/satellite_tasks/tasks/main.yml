@@ -4,9 +4,15 @@
   loop:
     - 'ansible_distribution*'
     - 'ansible_hostname'
+  tags:
+    always
 
-- name: register_to_satellite
+- name: Register to Satellite
   command: "subscription-manager register --org={{ org }} --activationkey={{ reg_key6 }}"
-#  ignore_errors: true
-   tags:
-     - register
+  tags:
+    register
+
+- name: Unregister from Satellite
+  command: "subscription-manager unregister"
+  tags:
+    unregister
