@@ -1,26 +1,26 @@
 [all_lab]
-rhel7-01
-rhel7-02
-rhel8-01
-rhel8-02
-rhel9-01
-rhel9-02
+rhel7-01 ansible_host=10.10.10.100
+rhel7-02 ansible_host=10.10.10.101
+rhel8-01 ansible_host=10.10.10.102
+rhel8-02 ansible_host=10.10.10.104
+rhel9-01 ansible_host=10.10.10.117
+rhel9-02 ansible_host=10.10.10.118
 
 [exclude]
-rhel6-01
-rhel6-02
+rhel6-01 ansible_host=10.10.10.115
+rhel6-02 ansible_host=10.10.10.116
 
 [rhel7]
-rhel7-01
-rhel7-02
+rhel7-01 ansible_host=10.10.10.100
+rhel7-02 ansible_host=10.10.10.101
 
 [rhel8]
-rhel8-01
-rhel8-02
+rhel8-01 ansible_host=10.10.10.102
+rhel8-02 ansible_host=10.10.10.104
 
 [rhel9]
-rhel9-01
-rhel9-02
+rhel9-01 ansible_host=10.10.10.117
+rhel9-02 ansible_host=10.10.10.118
 
 [pihole]
 ubuntu-pihole
