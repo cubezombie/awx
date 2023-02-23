@@ -2,18 +2,14 @@
 - hosts: all
   gather_facts: false
   become: true
-  tags: register
   tasks:
     - name: Register VMs to Satellite
-      ansible.builtin.include_role:
+      ansible.builtin.import_role:
         name: roles/satellite_tasks
+      tags: register
 
-- hosts: all
-  gather_facts: false
-  become: true
-  tags: unregister
-  tasks:
     - name: Unregister VMs from  Satellite
-      ansible.builtin.include_role:
+      ansible.builtin.import_role:
         name: roles/satellite_tasks
+      tags: unregister
 
