@@ -2,12 +2,18 @@
 - hosts: all
   gather_facts: false
   become: true
+  tags: register
   tasks:
-    - name: Get Distro and Hostname
-      ansible.builtin.import_role:
-        name: roles/satellite_tasks
-        
     - name: Register VMs to Satellite
-      ansible.builtin.import_role:
+      ansible.builtin.include_role:
+        name: roles/satellite_tasks
+
+- hosts: all
+  gather_facts: false
+  become: true
+  tags: unregister
+  tasks:
+    - name: Unregister VMs from  Satellite
+      ansible.builtin.include_role:
         name: roles/satellite_tasks
 

@@ -1,18 +1,18 @@
 ---
-- setup:
-    filter: "{{ item }}"
-  loop:
-    - 'ansible_distribution*'
-    - 'ansible_hostname'
-  tags:
-    always
+#- setup:
+#    filter: "{{ item }}"
+#  loop:
+#    - 'ansible_distribution*'
+#    - 'ansible_hostname'
+#  tags:
+#    - always
 
 - name: Register to Satellite
   command: "subscription-manager register --org={{ org }} --activationkey={{ reg_key6 }}"
   tags:
-    - register
+   - register
 
 - name: Unregister from Satellite
   command: "subscription-manager unregister"
   tags:
-    - unregister
+   - unregister
