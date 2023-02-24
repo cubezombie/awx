@@ -1,23 +1,25 @@
 ---
 ## Variables for linux_patching role. Will affect all playbooks using this role.
 custom_flag_path: /opt/Tanium/TaniumClient/Tools/CustomTags.txt
-#custom_flag_failed_when: "autoreboot.rc != 1 and autoreboot.rc != 0"
-#custom_flag_print_when: autoreboot.stdout is search("FALSE")
-#custom_flag_print_out: "{{ ansible_hostname }} is not set to autoreboot but may have been updated and may need to be rebooted manually."
 yum_update_async: "3600"
 yum_update_poll: "10"
-#yum_update_when: autoreboot.stdout is search("TRUE") or autoreboot.stdout is search("FALSE")
 chk_reboot_rhel6_svc: "/usr/bin/needs-restarting | grep -E 'sshd|init'"
-#chk_reboot_rhel6_when: ansible_distribution == "RedHat" and ansible_distribution_major_version == "6"
-#chk_reboot_rhel6_failed_when: "reboot_needed6.rc == 2"
 chk_reboot_rhel7_svc: "/usr/bin/needs-restarting -r"
-#chk_reboot_rhel7_failed_when: "reboot_needed.rc == 2"
-#chk_reboot_rhel7_when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "9")
 console_reboot_msg: "Reboot initiated by Ansible for BAU monthly patching activity"
 server_reboot_pre_delay: "0"
 server_reboot_post_delay: "60"
 server_reboot_timeout: "600"
 server_reboot_test_cmd: "whoami"
+
+
+## Not working
+#custom_flag_failed_when: "autoreboot.rc != 1 and autoreboot.rc != 0"
+#custom_flag_print_when: autoreboot.stdout is search("FALSE")
+#custom_flag_print_out: "{{ ansible_hostname }} is not set to autoreboot but may have been updated and may need to be rebooted manually."
+#yum_update_when: autoreboot.stdout is search("TRUE") or autoreboot.stdout is search("FALSE")
+##chk_reboot_rhel6_when: ansible_distribution == "RedHat" and ansible_distribution_major_version == "6"
+#chk_reboot_rhel6_failed_when: "reboot_needed6.rc == 2"
+#chk_reboot_rhel7_failed_when: "reboot_needed.rc == 2"
+#chk_reboot_rhel7_when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8") or (ansible_distribution == "RedHat" and ansible_distribution_major_version == "9")
 #server_reboot_when_rhel6: ansible_distribution == "RedHat" and ansible_distribution_major_version == "6" and reboot_needed6.rc == 0 and autoreboot.stdout is search("TRUE-PT"))
 #server_reboot_when_rhel7: ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" and reboot_needed.rc == 1 and autoreboot.stdout is search("TRUE-PT")) or ansible_distribution == "RedHat" and ansible_distribution_major_version == "8" and reboot_needed.rc == 1 and autoreboot.stdout is search("TRUE-PT")) or ansible_distribution == "RedHat" and ansible_distribution_major_version == "9" and reboot_needed.rc == 1 and autoreboot.stdout is search("TRUE-PT"))
-

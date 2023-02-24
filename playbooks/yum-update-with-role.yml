@@ -5,27 +5,3 @@
     - linux_patching 
   tags: update
 
-
-
-
-
-
-
-#- hosts: localhost
-#  gather_facts: no
-#  tags: prod
-#  tasks:
-#    - name: Gather Prod src lists
-#      ansible.builtin.include_role:
-#        name: create_inventory
-#        tasks_from: prod-gather-src-lists
-#    
-#    - name: Create new "{{ inventory_main_prod }}"
-#      ansible.builtin.include_role:
-#        name: create_inventory
-#        tasks_from: prod-create-main-inventory
-#    
-#    - name: Write to "{{ inventory_out_prod }}"
-#      ansible.builtin.include_role:
-#        name: create_inventory
-#        tasks_from: prod-write-to-main-inventory

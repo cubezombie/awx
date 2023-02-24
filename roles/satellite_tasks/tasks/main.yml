@@ -10,9 +10,9 @@
 - name: Register to Satellite
   command: "subscription-manager register --org={{ org }} --activationkey={{ reg_key6 }}"
   tags:
-   - [ never, register ]
+    [ never, register ]
 
 - name: Unregister from Satellite
   command: "subscription-manager unregister"
   tags:
-   - [ never, unregister ]
+    [ never, unregister ]
