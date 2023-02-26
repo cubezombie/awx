@@ -1,34 +1,38 @@
 ---
 - hosts: all
   gather_facts: no
-  tasks:
-    - name: Start Lab VMs
-      ansible.builtin.include_role:
-        name: roles/lab_hypervisor_tasks
-      tags: start
+  roles:
+    - role: roles/lab_hypervisor_tasks
 
-    - name: Stop Lab VMs
-      ansible.builtin.include_role:
-        name: roles/lab_hypervisor_tasks
-      tags: stop
 
-    - name: Shutdown Lab VMs
-      ansible.builtin.include_role:
-        name: roles/lab_hypervisor_tasks
-      tags: shutdown
 
-    - name: Rollback Lab VMs
-      ansible.builtin.include_role:
-        name: roles/lab_hypervisor_tasks
-      tags: rollback
-
-    - name: Find Lab VMs Across Cluster
-      ansible.builtin.include_role:
-        name: roles/lab_hypervisor_tasks
-      tags: findnode
-
-    - name: Print return information from the previous task
-      ansible.builtin.debug:
-        var: findnode
-        verbosity: 2
+#    - name: Start Lab VMs
+#      ansible.builtin.include_role:
+#        name: roles/lab_hypervisor_tasks
+#      tags: start
+#
+#    - name: Stop Lab VMs
+#      ansible.builtin.include_role:
+#        name: roles/lab_hypervisor_tasks
+#      tags: stop
+#
+#    - name: Shutdown Lab VMs
+#      ansible.builtin.include_role:
+#        name: roles/lab_hypervisor_tasks
+#      tags: shutdown
+#
+#    - name: Rollback Lab VMs
+#      ansible.builtin.include_role:
+#        name: roles/lab_hypervisor_tasks
+#      tags: rollback
+#
+#    - name: Find Lab VMs Across Cluster
+#      ansible.builtin.include_role:
+#        name: roles/lab_hypervisor_tasks
+#      tags: findnode
+#
+#    - name: Print return information from the previous task
+#      ansible.builtin.debug:
+#        var: findnode
+#        verbosity: 2
 
