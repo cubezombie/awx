@@ -55,6 +55,19 @@
   tags:
    - shutdown
 
+- name: Take a Snapshot
+  command: /usr/sbin/qm snapshot "{{ item }}" "{{ snap_name }}"
+  loop:
+    - "{{ rhel6_01 }}"  
+    - "{{ rhel6_02 }}"
+    - "{{ rhel7_01 }}"
+    - "{{ rhel7_02 }}"
+    - "{{ rhel8_01 }}"
+    - "{{ rhel8_02 }}"
+    - "{{ rhel9_01 }}"
+    - "{{ rhel9_02 }}"
+  tags:
+   - snapshot
 
 - name: Find Nodes Across Cluster
   command: pvesh get /cluster/resources --type vm
