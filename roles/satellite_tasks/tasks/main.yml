@@ -5,14 +5,16 @@
     - 'ansible_distribution*'
     - 'ansible_hostname'
   tags:
-    - never
+    - always
 
 - name: Register to Satellite
   command: "subscription-manager register --org={{ org }} --activationkey={{ reg_key6 }}"
-  tags:
-    [ never, register ]
+  tags: [ never, register ]
+
+- name: Unregister to Satellite
+  command: "subscription-manager unregister"
+  tags: [ never, unregister ]
 
 - name: Unregister from Satellite
   command: "subscription-manager unregister"
-  tags:
-    [ never, unregister ]
+  tags: [ never, unregister ]
