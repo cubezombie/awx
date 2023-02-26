@@ -5,28 +5,3 @@
   roles:
     - role: roles/satellite_tasks
 
-#- hosts: all
-#  gather_facts: false
-#  become: true
-#  roles:
-#    - roles/satellite_tasks
-#  tags:
-#    - unregister
-
-
-
-
-
-
-
-#  tasks:
-#    - name: Register VMs to Satellite
-#      ansible.builtin.import_role:
-#        name: roles/satellite_tasks
-#      tags: register
-#
-#    - name: Unregister VMs from  Satellite
-#      ansible.builtin.import_role:
-#        name: roles/satellite_tasks
-#      tags: unregister
-

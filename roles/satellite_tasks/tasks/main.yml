@@ -15,6 +15,3 @@
   command: "subscription-manager unregister"
   tags: [ never, unregister ]
 
-- name: Unregister from Satellite
-  command: "subscription-manager unregister"
-  tags: [ never, unregister ]
