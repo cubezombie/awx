@@ -1,6 +1,9 @@
 ---
 - setup:
     gather_subset: min
+    filter:
+      - ansible_distribution(
+      - ansible_hostname
   tags: always
 
 - name: Register to Satellite
