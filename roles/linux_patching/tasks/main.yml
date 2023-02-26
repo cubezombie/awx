@@ -1,11 +1,10 @@
 ---
 - setup:
-    filter: "{{ item }}"
-  loop:
-    - 'ansible_distribution*'
-    - 'ansible_hostname'
-  tags:
-    - always
+    gather_subset: min
+    filter:
+      - ansible_distribution*
+      - ansible_hostname
+    tags: always
 
 ## Check reboot flag in /opt/Tanium/TaniumClient/Tools/CustomTags.txt
 - name: Check Reboot Flag
@@ -13,8 +12,7 @@
   register: autoreboot
   failed_when: "autoreboot.rc != 1 and autoreboot.rc != 0"
   ignore_errors: true
-  tags:
-    - always
+  tags: always
 
 ## Run yum update. This updates everything on a system
 - name: Update Server
