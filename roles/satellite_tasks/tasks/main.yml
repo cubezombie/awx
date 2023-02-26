@@ -1,11 +1,7 @@
 ---
 - setup:
-    filter: "{{ item }}"
-  loop:
-    - 'ansible_distribution*'
-    - 'ansible_hostname'
-  tags:
-    - always
+    gather_subset: min
+  tags: always
 
 - name: Register to Satellite
   command: "subscription-manager register --org={{ org }} --activationkey={{ reg_key6 }}"
