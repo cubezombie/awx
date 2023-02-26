@@ -4,7 +4,7 @@
     filter:
       - ansible_distribution*
       - ansible_hostname
-    tags: always
+#    tags: always
 
 ## Check reboot flag in /opt/Tanium/TaniumClient/Tools/CustomTags.txt
 - name: Check Reboot Flag
