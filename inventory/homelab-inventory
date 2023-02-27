@@ -5,8 +5,12 @@ rhel8-01 ansible_host=10.10.10.102
 rhel8-02 ansible_host=10.10.10.104
 rhel9-01 ansible_host=10.10.10.117
 rhel9-02 ansible_host=10.10.10.118
+rhel6-01 ansible_host=10.10.10.115
+rhel6-02 ansible_host=10.10.10.116
 
 [exclude]
+
+[rhel6]
 rhel6-01 ansible_host=10.10.10.115
 rhel6-02 ansible_host=10.10.10.116
 
