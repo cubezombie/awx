@@ -246,10 +246,10 @@
         become: true
 
       - name: Clean yum cache
-        command: yum clean all
+        file:
+          path: /var/cache/yum
+          state: absent
         async: 120
         poll: 10
-        args:
-          warn: false
         register: clean_chk
         ignore_errors: true
