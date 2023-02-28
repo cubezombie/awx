@@ -23,7 +23,7 @@
     register: yum_update_test
     ignore_errors: true
     async: 3600
-    poll: 30
+    poll: 5
     failed_when: yum_update_test.results == []
 
 #  - name: Print output
