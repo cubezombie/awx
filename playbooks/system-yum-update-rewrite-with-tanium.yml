@@ -22,6 +22,8 @@
       list=updates
     register: yum_update_test
     ignore_errors: true
+    async: 3600
+    poll: 30
     failed_when: yum_update_test.results == []
 
 #  - name: Print output
