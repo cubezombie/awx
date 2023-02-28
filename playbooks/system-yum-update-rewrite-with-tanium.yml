@@ -24,9 +24,9 @@
     ignore_errors: true
     failed_when: yum_update_test.results == []
 
-  - name: Print output
-    debug:
-      var: yum_update_test
+#  - name: Print output
+#    debug:
+#      var: yum_update_test
 
   - name: Fix rpmdb corruption issues
     block:
