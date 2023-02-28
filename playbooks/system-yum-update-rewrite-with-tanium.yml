@@ -19,19 +19,17 @@
 
   - name: Test if yum sees updates (no actual update)
     yum:
-      name: "*"
-      state: latest
+      list=updates
     register: yum_update_test
-    check_mode: true
     ignore_errors: true
-    failed_when: yum_update_test.changed == false
+    failed_when: yum_update_test.results == []
+
+  - name: Print output
+    debug:
+      var: yum_update_test
 
   - name: Fix rpmdb corruption issues
     block:
-#      - name: Print output
-#        debug:
-#          var: ansible_distribution
-
       - name: Stop TaniumClient (RHEL 6)
         service:
           name: TaniumClient
@@ -112,7 +110,7 @@
           - name: See if rpm is working again
             command:
               cmd: rpm -qa redhat-release*
-            when: yum_update_test.changed == false
+            when: yum_update_test.results == []
             poll: 5
             async: 60
 
@@ -121,7 +119,7 @@
               cmd: subscription-manager repos
             become: true
             register: subscription_manager_repos_retry
-            when: yum_update_test.changed == false
+            when: yum_update_test.results == []
             changed_when: false
             poll: 5
             async: 60
@@ -156,7 +154,7 @@
         service:
           name: rhsmcertd
           state: started
-    when: yum_update_test.changed == false
+    when: yum_update_test.results == []
     become: true
 
 
