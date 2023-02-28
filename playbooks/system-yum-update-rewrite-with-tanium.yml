@@ -23,7 +23,6 @@
     register: yum_update_test
     ignore_errors: true
     timeout: 300
-#    failed_when: yum_update_test.results == []
 
   - name: Print output
     debug:
@@ -152,7 +151,7 @@
         service:
           name: rhsmcertd
           state: started
-    when: yum_update_test.results == []
+    when: yum_update_test.results == [] or yum_update_test.msg is search("Berkeley") or yum_update_test.msg is search("checksum is invalid")
     become: true
 
 
