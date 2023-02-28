@@ -30,7 +30,7 @@
     block:
       - name: Print output
         debug:
-          var: ansible_hostname
+          var: ansible_distribution
 
       - name: Stop TaniumClient (RHEL 6)
         service:
