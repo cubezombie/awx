@@ -23,11 +23,11 @@
     register: yum_update_test
     ignore_errors: true
     timeout: 300
-    failed_when: yum_update_test.results == []
+#    failed_when: yum_update_test.results == []
 
-#  - name: Print output
-#    debug:
-#      var: yum_update_test
+  - name: Print output
+    debug:
+      var: yum_update_test
 
   - name: Fix rpmdb corruption issues
     block:
