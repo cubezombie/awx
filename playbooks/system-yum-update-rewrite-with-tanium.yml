@@ -1,0 +1,219 @@
+---
+- hosts: all,!exclude
+  gather_facts: no
+  become: yes
+  ignore_unreachable: true
+  tasks:
+  - setup:
+      gather_subset: min
+      gather_timeout: 60
+      filter:
+        - ansible_distribution*
+        - ansible_hostname
+
+  - name: Check Reboot flag
+    shell: "grep -E 'TRUE|FALSE' /opt/Tanium/TaniumClient/Tools/CustomTags.txt"
+    register: autoreboot
+    failed_when: autoreboot.rc != 1 and autoreboot.rc != 0
+    ignore_errors: true
+
+  - name: Test if yum sees updates (no actual update)
+    yum:
+      name: "*"
+      state: latest
+    register: yum_update_test
+    check_mode: true
+    ignore_errors: true
+    failed_when: yum_update_test.changed == false
+
+  - name: Fix rpmdb corruption issues
+    block:
+      - name: Print output
+        debug:
+          var: ansible_hostname
+
+      - name: Stop TaniumClient (RHEL 6)
+        service:
+          name: TaniumClient
+          state: stopped
+        when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
+
+      - name: Stop TaniumClient (RHEL 7+)
+        service:
+          name: taniumclient
+          state: stopped
+        when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or
+              (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8") or
+              (ansible_distribution == "RedHat" and ansible_distribution_major_version == "9")
+
+      - name: Stop rhsmcertd
+        service:
+          name: rhsmcertd
+          state: stopped
+
+      - name: Find what is using subscription-manager
+        shell:
+          cmd: grep "[[:digit:]]*" /var/run/rhsm/cert.pid
+        become: true
+        register: sub_man_pid
+        ignore_errors: true
+        changed_when: false
+
+      - name: Kill what is using subscription-manager
+        block:
+          - name: Kill what is holding subscription-manager
+            shell:
+              cmd: kill -9 $(cat /var/run/rhsm/cert.pid)
+            register: kill_certpid
+            become: true
+
+          - name: Remove /var/run/rhsm/cert.pid if process doesn't exist
+            shell:
+              cmd: rm /var/run/rhsm/cert.pid
+            become: true
+            when: 'kill_certpid.failed == true and kill_certpid.stderr is search("No such process)'
+        when: sub_man_pid.failed == false
+        ignore_errors: true
+
+      - name: Rebuild tasks
+        block:
+          - name: Kill all rpm/yum commands
+            shell:
+              cmd: kill -9 $(ps -ef | grep -v grep | grep "rpm\yum" | awk '{ if($3=1){ print $2 } }')
+            ignore_errors: true
+
+          - name: Remove /var/lib/rpm/.dbenv.lock
+            file:
+              path: /var/lib/rpm/.rpm.lock
+              state: absent
+            become: true
+
+          - name: Remove /var/lib/rpm/.rpm.lock
+            file:
+              path: /var/lib/rpm/rpm/.rpm.lock
+              state: absent
+            become: true
+
+          - name: Backup rpmdb files
+            shell:
+              cmd: mv /var/lib/rpm/__db* /tmp/.
+
+          - name: Rebuild DB
+            command:
+              cmd: rpm --rebuilddb
+            poll: 5
+            async: 120
+
+          - name: Start rhsmcertd
+            service:
+              name: rhsmcertd
+              state: started
+
+          - name: See if rpm is working again
+            command:
+              cmd: rpm -qa redhat-release*
+            when: yum_update_test.changed == false
+            poll: 5
+            async: 60
+
+          - name: See if repos work
+            command:
+              cmd: subscription-manager repos
+            become: true
+            register: subscription_manager_repos_retry
+            when: yum_update_test.changed == false
+            changed_when: false
+            poll: 5
+            async: 60
+
+        rescue:
+          - name: Put RPMDB files back
+            shell:
+              cmd: mv /tmp/__db* /var/lib/rpm/
+            register: rpmdb_revert
+
+          - name: Successfully put back RPMDB files
+            fail:
+              msg: "Failed to recover db, recovery successful"
+            when: rpmdb_revert.failed == false
+
+    always:
+      - name: Start TaniumClient (RHEL 6)
+        service:
+          name: TaniumClient
+          state: started
+        when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
+
+      - name: Start taniumclient (RHEL 7+)
+        service:
+          name: taniumclient
+          state: started
+        when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or
+              (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8") or
+              (ansible_distribution == "RedHat" and ansible_distribution_major_version == "9")
+
+      - name: Start rhsmcertd
+        service:
+          name: rhsmcertd
+          state: started
+    when: yum_update_test.changed == false
+    become: true
+
+
+#  - name: Update hosts
+#    register: yum_update_out
+#    async: 3600
+#    poll: 10
+#    yum:
+#      name: "*"
+#      state: latest
+#    when: autoreboot.stdout is search("TRUE") or autoreboot.stdout is search("FALSE")
+
+#  - name: Print return information from the previous task
+#    ansible.builtin.debug:
+#     var: yum_update_test
+
+#  - name: Check if reboot is needed RHEL6
+#    shell: "/usr/bin/needs-restarting | grep -E 'sshd|init'"
+#    register: reboot_needed6
+#    ignore_errors: true
+#    changed_when: false
+#    failed_when: reboot_needed6.rc == 2
+#    when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
+#
+#  - name: Check if reboot is needed RHEL7+
+#    shell: "/usr/bin/needs-restarting -r"
+#    register: reboot_needed
+#    ignore_errors: true
+#    changed_when: false
+#    failed_when: reboot_needed.rc == 2
+#    when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or
+#          (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8") or
+#          (ansible_distribution == "RedHat" and ansible_distribution_major_version == "9")
+#
+#  - name: Reboot Server RHEL6
+#    reboot:
+#      msg: "Reboot initiated by Ansible for BAU monthly patching activity"
+#      pre_reboot_delay: 0
+#      post_reboot_delay: 60
+#      reboot_timeout: 600
+#      test_command: "whoami"
+#    ignore_errors: true
+#    when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6" and reboot_needed6.rc == 0 and autoreboot.stdout is search("TRUE-PT"))
+#
+#  - name: Reboot Server RHEL7+
+#    reboot:
+#      msg: "Reboot initiated by Ansible for BAU monthly patching activity"
+#      pre_reboot_delay: 0
+#      post_reboot_delay: 60
+#      reboot_timeout: 600
+#      test_command: "whoami"
+#    ignore_errors: true
+#    when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" and reboot_needed.rc == 1 and autoreboot.stdout is search("TRUE-PT")) or
+#          (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8" and reboot_needed.rc == 1 and autoreboot.stdout is search("TRUE-PT")) or
+#          (ansible_distribution == "RedHat" and ansible_distribution_major_version == "9" and reboot_needed.rc == 1 and autoreboot.stdout is search("TRUE-PT"))
+#
+#  - name: Hosts with autoreboot set to false
+#    when: autoreboot.stdout is search("FALSE-PT")
+#    debug: msg="{{ ansible_hostname }} is not set to autoreboot but may have been updated and may need to be rebooted manually."
+
