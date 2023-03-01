@@ -16,6 +16,7 @@
     register: autoreboot
     failed_when: autoreboot.rc != 1 and autoreboot.rc != 0
     ignore_errors: true
+    timeout: 30
 
   - name: Test if yum sees updates (no actual update)
     yum:
@@ -27,6 +28,7 @@
   - name: Print output
     debug:
       var: yum_update_test
+      verbosity: 3
 
   - name: Fix rpmdb corruption issues
     block:
@@ -35,6 +37,7 @@
           name: TaniumClient
           state: stopped
         when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
+        timeout: 60
 
       - name: Stop TaniumClient (RHEL 7+)
         service:
@@ -43,11 +46,13 @@
         when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or
               (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8") or
               (ansible_distribution == "RedHat" and ansible_distribution_major_version == "9")
+        timeout: 60
 
       - name: Stop rhsmcertd
         service:
           name: rhsmcertd
           state: stopped
+        timeout: 60
 
       - name: Find what is using subscription-manager
         shell:
@@ -56,6 +61,7 @@
         register: sub_man_pid
         ignore_errors: true
         changed_when: false
+        timeout: 60
 
       - name: Kill what is using subscription-manager
         block:
@@ -64,12 +70,14 @@
               cmd: kill -9 $(cat /var/run/rhsm/cert.pid)
             register: kill_certpid
             become: true
+            timeout: 60
 
           - name: Remove /var/run/rhsm/cert.pid if process doesn't exist
             shell:
               cmd: rm /var/run/rhsm/cert.pid
             become: true
             when: 'kill_certpid.failed == true and kill_certpid.stderr is search("No such process)'
+            timeout: 60
         when: sub_man_pid.failed == false
         ignore_errors: true
 
@@ -79,22 +87,26 @@
             shell:
               cmd: kill -9 $(ps -ef | grep -v grep | grep "rpm\yum" | awk '{ if($3=1){ print $2 } }')
             ignore_errors: true
+            timeout: 60
 
           - name: Remove /var/lib/rpm/.dbenv.lock
             file:
               path: /var/lib/rpm/.rpm.lock
               state: absent
             become: true
+            timeout: 60
 
           - name: Remove /var/lib/rpm/.rpm.lock
             file:
               path: /var/lib/rpm/rpm/.rpm.lock
               state: absent
             become: true
+            timeout: 60
 
           - name: Backup rpmdb files
             shell:
               cmd: mv /var/lib/rpm/__db* /tmp/.
+            timeout: 60
 
           - name: Rebuild DB
             command:
@@ -105,11 +117,12 @@
             service:
               name: rhsmcertd
               state: started
+            timeout: 60
 
           - name: See if rpm is working again
             command:
               cmd: rpm -qa redhat-release*
-            when: yum_update_test.results == []
+            when: yum_update_test.failed == true
             timeout: 60
 
           - name: See if repos work
@@ -117,7 +130,7 @@
               cmd: subscription-manager repos
             become: true
             register: subscription_manager_repos_retry
-            when: yum_update_test.results == []
+            when: yum_update_test.failed == true
             changed_when: false
             timeout: 60
 
@@ -126,11 +139,13 @@
             shell:
               cmd: mv /tmp/__db* /var/lib/rpm/
             register: rpmdb_revert
+            timeout: 60
 
           - name: Successfully put back RPMDB files
             fail:
               msg: "Failed to recover db, recovery successful"
             when: rpmdb_revert.failed == false
+            timeout: 60
 
     always:
       - name: Start TaniumClient (RHEL 6)
@@ -138,6 +153,7 @@
           name: TaniumClient
           state: started
         when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
+        timeout: 60
 
       - name: Start taniumclient (RHEL 7+)
         service:
@@ -146,12 +162,14 @@
         when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or
               (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8") or
               (ansible_distribution == "RedHat" and ansible_distribution_major_version == "9")
+        timeout: 60
 
       - name: Start rhsmcertd
         service:
           name: rhsmcertd
           state: started
-    when: yum_update_test.results == [] or yum_update_test.msg is search("Berkeley") or yum_update_test.msg is search("checksum is invalid")
+        timeout: 60
+    when: yum_update_test.failed == true
     become: true
 
 
