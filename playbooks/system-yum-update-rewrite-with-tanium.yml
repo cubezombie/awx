@@ -28,7 +28,7 @@
   - name: Print output
     debug:
       var: yum_update_test
-      verbosity: 3
+      verbosity: 2
 
   - name: Fix rpmdb corruption issues
     block:
