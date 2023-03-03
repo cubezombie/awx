@@ -1,8 +1,7 @@
----
 - hosts: all
-  gather_facts: false
+  gather_facts: no
   ignore_unreachable: true
-  become: true
+  become: yes
   tasks:
       - setup:
           gather_subset: min
@@ -12,7 +11,7 @@
             - ansible_hostname
 
       - name: Check Reboot flag
-        shell: "grep -E 'TRUE|FALSE' /opt/Tanium/TaniumClient/Tools/CustomTags.txt"
+        shell: "grep -E 'TRUE|FALSE|PT' /opt/Tanium/TaniumClient/Tools/CustomTags.txt"
         register: autoreboot
         failed_when: false
         ignore_errors: true
@@ -21,20 +20,20 @@
       - name: Missing Reboot flag
         when: autoreboot.rc == 2
         debug: msg="{{ ansible_hostname }} is missing the CustomTags.txt file. Open incident with the Patch Engineering Team"
-        ignore_errors: true
+        ignore_errors: yes
         timeout: 60
 
       - name: Check for any generic yum errors
         shell: yum update --assumeno
         register: yum_generic_error
         failed_when: false
-        ignore_errors: true
+        ignore_errors: yes
         timeout: 60
 
       - name: Generic yum errors found
         when: yum_generic_error.stdout is search("Error")
         debug: msg="There is a yum error that will prevent the update. Open incident with Server Linux Operations"
-        ignore_errors: true
+        ignore_errors: yes
         timeout: 60
 
       - name: Find yumtx files in /tmp
@@ -42,7 +41,7 @@
           paths: /tmp/
           patterns: '*.yumtx'
           age: 1m
-          recurse: false
+          recurse: no
         register: yumtx
         timeout: 60
 
@@ -59,7 +58,7 @@
           file_type: directory
           patterns: 'yum-*'
           age: 1m
-          recurse: false
+          recurse: no
         register: useryum
         timeout: 60
 
@@ -68,33 +67,33 @@
           path: "{{ item.path }}"
           state: absent
         with_items: "{{ useryum.files }}"
-        ignore_errors: true
+        ignore_errors: yes
         timeout: 60
 
       - name: Check RHSM Base URL
-        shell: grep -i subscription.rhsm.redhat.com /etc/rhsm/rhsm.conf
+        shell: grep -iE 'uscku|ustry|usaze' /etc/rhsm/rhsm.conf
         register: rhsm_base_url
-        ignore_errors: true
+        ignore_errors: yes
         timeout: 60
 
       - name: Wrong RHSM Base URL
         when: rhsm_base_url.rc == 1
         failed_when: rhsm_base_url.rc == 1
         debug: msg="Wrong satellite server configured for this host. Open INC with Server Linux Operations"
-        ignore_errors: true
+        ignore_errors: yes
         timeout: 60
 
       - name: Check if repos are enabled
         shell: subscription-manager repos --list-enabled
         register: repos_enabled
         timeout: 60
-        ignore_errors: true
+        ignore_errors: yes
 
       - name: No repos enabled
         when: repos_enabled.stdout is search("There were no available repositories matching the specified criteria.")
         failed_when: repos_enabled.stdout is search("There were no available repositories matching the specified criteria.") or repos_enabled.stdout is search("This system has no repositories available through subscriptions.")
-        debug: msg="No repos enabled. Open INC with Linux Operations"
-        ignore_errors: true
+        debug: msg="No repos enabled. Open INC with Server Linux Operations"
+        ignore_errors: yes
         timeout: 60
 
       - name: See if rpm is working
@@ -102,21 +101,21 @@
           warn: false
         command:
           cmd: rpm -qa redhat-release*
-        become: true
+        become: yes
         register: rpm_check
         failed_when: rpm_check.stderr is search("Berkeley") or repos_enabled.changed == False or repos_enabled.stderr is search("PANIC") or rpm_check.stderr is search("Cannot allocate memory")
         changed_when: false
-        ignore_errors: true
+        ignore_errors: yes
         timeout: 60
 
       - name: See if repos times out
         command:
           cmd: subscription-manager repos --list-enabled
-        become: true
+        become: yes
         register: subscription_manager_repos
         failed_when: subscription_manager_repos.stderr is search("Berkeley")
         changed_when: false
-        ignore_errors: true
+        ignore_errors: yes
         timeout: 60
 
       - name: Rebuild rpmdb if broken
@@ -132,10 +131,10 @@
             service:
               name: taniumclient
               state: stopped
+            timeout: 60
             when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or
                   (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8") or
                   (ansible_distribution == "RedHat" and ansible_distribution_major_version == "9")
-            timeout: 60
 
           - name: Stop rhsmcertd
             service:
@@ -146,9 +145,9 @@
           - name: Attempt to find what is using subscription-manager
             shell:
               cmd: grep "[[:digit:]]*" /var/run/rhsm/cert.pid
-            become: true
+            become: yes
             register: sub_man_pid
-            ignore_errors: true
+            ignore_errors: yes
             changed_when: false
             timeout: 60
 
@@ -158,37 +157,37 @@
                 shell:
                   cmd: kill -9 $(cat /var/run/rhsm/cert.pid)
                 register: kill_certpid
-                become: true
+                become: yes
+                timeout: 60
 
               - name: Remove /var/run/rhsm/cert.pid if process doesn't exist
                 shell:
                   cmd: rm /var/run/rhsm/cert.pid
-                become: true
+                become: yes
                 when: 'kill_certpid.failed == true and kill_certpid.stderr is search("No such process")'
             when: sub_man_pid.failed == false
-            ignore_errors: true
-            timeout: 60
+            ignore_errors: yes
 
           - name: Rebuild tasks
             block:
               - name: Kill all rpm/yum commands
                 shell:
                   cmd: kill -9 $(ps -ef | grep -v grep | grep "rpm\|yum" | awk '{ if($3=1){ print $2 } }')
-                ignore_errors: true
+                ignore_errors: yes
                 timeout: 60
 
               - name: Remove /var/lib/rpm/.dbenv.lock
                 file:
                   path: /var/lib/rpm/.dbenv.lock
                   state: absent
-                become: true
+                become: yes
                 timeout: 60
 
               - name: Remove /var/lib/rpm/.rpm.lock
                 file:
                   path: /var/lib/rpm/.rpm.lock
                   state: absent
-                become: true
+                become: yes
                 timeout: 60
 
               - name: Back rpmdb files
@@ -217,7 +216,7 @@
               - name: See if repos works
                 command:
                   cmd: subscription-manager repos
-                become: true
+                become: yes
                 register: subscription_manager_repos_retry
                 when: subscription_manager_repos.failed == true
                 failed_when: subscription_manager_repos_retry.stderr is search("Berkeley")
@@ -230,7 +229,7 @@
                 register: rpmdb_revert
                 timeout: 60
 
-              - name: Successfully put back db files
+              - name: Fail is successfully put back db files
                 fail:
                   msg: "Failed to recover db, reverted successfully"
                 when: rpmdb_revert.failed == false
@@ -258,7 +257,7 @@
               state: started
             timeout: 60
         when: rpm_check.failed == true or subscription_manager_repos.failed == true
-        become: true
+        become: yes
 
       - name: Clean yum cache
         file:
@@ -266,5 +265,5 @@
           state: absent
         timeout: 120
         register: clean_chk
-        ignore_errors: true
-        
+        ignore_errors: yes
+
