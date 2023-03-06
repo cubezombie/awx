@@ -54,6 +54,7 @@
     - "{{ rhel9_02 }}"
   tags:
    - shutdown
+  timeout: 120
 
 - name: Take a Snapshot
   command: /usr/sbin/qm snapshot "{{ item }}" "{{ snap_name }}"
