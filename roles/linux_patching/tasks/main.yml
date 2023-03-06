@@ -17,8 +17,7 @@
 ## Run yum update. This updates everything on a system
 - name: Update Server
   register: yum_update_out
-  async: "{{ yum_update_async }}"
-  poll: "{{ yum_update_poll }}"
+  timeout: "{{ yum_update_timeout }}"
   yum:
     name: "*"
     state: latest

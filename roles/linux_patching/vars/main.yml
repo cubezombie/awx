@@ -1,8 +1,7 @@
 ---
 ## Variables for linux_patching role. Will affect all playbooks using this role.
 custom_flag_path: /opt/Tanium/TaniumClient/Tools/CustomTags.txt
-yum_update_async: "3600"
-yum_update_poll: "10"
+yum_update_timeout: "3600"
 chk_reboot_rhel6_svc: "/usr/bin/needs-restarting | grep -E 'sshd|init'"
 chk_reboot_rhel7_svc: "/usr/bin/needs-restarting -r"
 console_reboot_msg: "Reboot initiated by Ansible for BAU monthly patching activity"
