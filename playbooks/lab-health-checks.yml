@@ -97,8 +97,6 @@
         timeout: 60
 
       - name: See if rpm is working
-        args:
-          warn: false
         command:
           cmd: rpm -qa redhat-release*
         become: yes
