@@ -31,4 +31,4 @@ ubuntu-pihole
 fedora-pihole
 
 [lab_host_hypervisor]
-lab-beast01
+homelab01
