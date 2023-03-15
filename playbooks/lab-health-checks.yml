@@ -2,6 +2,14 @@
   gather_facts: no
   ignore_unreachable: true
   become: yes
+  pre_tasks:
+    - name: Start Dummy Service
+      become: yes
+      systemd:
+        state: started
+        name: taniumclient
+      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7")
+
   tasks:
       - setup:
           gather_subset: min
