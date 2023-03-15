@@ -3,14 +3,8 @@
   ignore_unreachable: true
   become: yes
   pre_tasks:
-    - setup:
-        gather_subset: min
-        gather_timeout: 20
-        filter:
-          - ansible_distributon*
-          - ansible_hostname
-          
     - name: Start Dummy Service
+      gather_facts: yes
       become: yes
       systemd:
         state: started
