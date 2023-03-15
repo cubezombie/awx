@@ -3,6 +3,13 @@
   ignore_unreachable: true
   become: yes
   pre_tasks:
+    - setup:
+        gather_subset: min
+        gather_timeout: 20
+        filter:
+          - ansible_distributon*
+          - ansible_hostname
+          
     - name: Start Dummy Service
       become: yes
       systemd:
@@ -11,12 +18,12 @@
       when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7")
 
   tasks:
-      - setup:
-          gather_subset: min
-          gather_timeout: 60
-          filter:
-            - ansible_distribution*
-            - ansible_hostname
+#      - setup:
+#          gather_subset: min
+#          gather_timeout: 60
+#          filter:
+#            - ansible_distribution*
+#            - ansible_hostname
 
       - name: Check Reboot flag
         shell: "grep -E 'TRUE|FALSE|PT' /opt/Tanium/TaniumClient/Tools/CustomTags.txt"
