@@ -71,7 +71,7 @@
         timeout: 60
 
       - name: Check RHSM Base URL
-        shell: grep -iE 'uscku|ustry|usaze' /etc/rhsm/rhsm.conf
+        shell: grep -i 'subscription.rhsm.redhat.com' /etc/rhsm/rhsm.conf
         register: rhsm_base_url
         ignore_errors: yes
         timeout: 60
