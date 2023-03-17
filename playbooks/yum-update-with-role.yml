@@ -1,6 +1,22 @@
 ---
 - hosts: all
   gather_facts: false
+  pre_tasks:
+    - name: Start Dummy Service
+      become: yes
+      systemd:
+        state: started
+        name: taniumclient
+      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7")
+
   roles:
     - roles/linux_patching 
+
+  post_tasks:
+    - name: Stop Dummy Service
+      become: yes
+      systemd:
+        state: stopped
+        name: taniumclient
+      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7")
 
