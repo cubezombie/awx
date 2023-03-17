@@ -1,12 +1,13 @@
 ---
 - hosts: all
   gather_facts: false
-  - setup:
-      gather_subset: min
-      gather_timeout: 30
-      filter:
-        - ansible_distribution*
-        - ansilbe_hostname
+  tasks:
+    - setup:
+        gather_subset: min
+        gather_timeout: 30
+        filter:
+          - ansible_distribution*
+          - ansilbe_hostname
 
   pre_tasks:
     - name: Start Dummy Service
