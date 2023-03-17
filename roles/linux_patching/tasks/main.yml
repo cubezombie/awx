@@ -87,6 +87,6 @@
   systemd:
     state: restarted
     name: taniumclient
-  tags: service1
+  tags: [ never, service1 ]
   when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "7" and yum_update_out is not search("Nothing to do here"))
 
