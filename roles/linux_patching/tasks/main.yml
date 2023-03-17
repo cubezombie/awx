@@ -1,4 +1,10 @@
 ---
+## Tags in use
+# - update - runs update tasks
+# - always - always runs setup, check reboot flag and print reboot flag status
+# - never - never runs update or reboot tasks unless update tag is used
+# - service1 - restarts service1
+
 - setup:
     gather_subset: min
     filter:
@@ -80,7 +86,7 @@
     - always
 
 ## Restart service1 on RHEL7 when called
-- name: Restart Dummy Service1
+- name: Restart Service1
   become: true
   systemd:
     state: restarted
