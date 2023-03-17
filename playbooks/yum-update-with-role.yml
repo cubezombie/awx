@@ -2,13 +2,13 @@
 - hosts: all
   gather_facts: false
   pre_tasks:
-    tags: always
     - setup:
         gather_subset: min
         gather_timeout: 30
         filter:
           - ansible_distribution*
           - ansilbe_hostname
+        tags: always
 
     - name: Start Dummy Service
       become: yes
