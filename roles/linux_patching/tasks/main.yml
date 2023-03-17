@@ -30,10 +30,6 @@
   when: (autoreboot.stdout is search("TRUE") or autoreboot.stdout is search("FALSE"))
   tags: [ never, update ]
 
-- name: print yum_update_out
-  debug:
-    var: yum_update_out
-
 ## Check if RHEL6 VMs need a reboot after update
 - name: Check if reboot is needed on RHEL6 servers
   shell: "{{ chk_reboot_rhel6_svc }}"
@@ -92,5 +88,5 @@
     state: restarted
     name: taniumclient
   tags: service1
-  when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "7")
+  when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "7" and yum_update_out is not search("Nothing to do here"))
 
