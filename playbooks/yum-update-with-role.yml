@@ -1,7 +1,7 @@
 ---
 - hosts: all
   gather_facts: false
-  tasks:
+  pre_tasks:
     - setup:
         gather_subset: min
         gather_timeout: 30
@@ -9,7 +9,6 @@
           - ansible_distribution*
           - ansilbe_hostname
 
-  pre_tasks:
     - name: Start Dummy Service
       become: yes
       systemd:
