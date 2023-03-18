@@ -87,6 +87,6 @@
     state: restarted
     name: taniumclient
   tags: [ never, service1 ]
-  when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "8" and yum_update_out.msg is search("Nothing to do") and reboot_needed.stdout_lines is search("Reboot should not be necessary")) or
-        (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" and yum_update_out.results is search("Nothing to do here, all packages are up to date") and reboot_needed.stdout_lines is search("Reboot is probably not necessary"))
+  when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "8" and yum_update_out.changed == false and reboot_needed.stdout_lines is search("Reboot should not be necessary")) or
+        (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" and yum_update_out.changed == false and reboot_needed.stdout_lines is search("Reboot is probably not necessary"))
 
