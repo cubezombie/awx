@@ -1,38 +1,32 @@
 Role Name
 =========
 
-A brief description of the role goes here.
-
-Requirements
-------------
-
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This role handles patching all US(currently) Linux Servers at MetLife.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+Coming soon
 
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
-
-Example Playbook
+Required Tags
 ----------------
+User Tags:
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+The tags below can be called by users in their AAP templates.
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+- update - runs update task as well as reboot tasks if needed
+- service1 - conditionally restarts service1 if there is an update but no reboot required
 
-License
--------
+Non-User Tags:
 
-BSD
+The tags below are automatic and should not be called by users.
 
-Author Information
+- always- runs setup, check reboot flag and print reboot flag status if no tags are given
+- never - never runs update task or reboot task unless update tag is used
+
+Coming Soon:
+
+- chkrpmdb - this will check for and fix any rpmdb corruption that's found.
+
+Contributor Information
 ------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).

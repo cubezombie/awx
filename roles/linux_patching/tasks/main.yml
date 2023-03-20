@@ -3,7 +3,7 @@
 # - update - runs update tasks
 # - always - always runs setup, check reboot flag and print reboot flag status
 # - never - never runs update or reboot tasks unless update tag is used
-# - service1 - restarts service1
+# - service1 - conditionally restarts service1
 
 - setup:
     gather_subset: min
@@ -85,7 +85,7 @@
 - name: Restart Service1
   systemd:
     state: restarted
-    name: taniumclient
+    name: service1
   tags: [ never, service1 ]
   when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "8" and yum_update_out.changed == true and reboot_needed.stdout_lines is search("Reboot should not be necessary")) or
         (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" and yum_update_out.changed == true and reboot_needed.stdout_lines is search("Reboot is probably not necessary"))
