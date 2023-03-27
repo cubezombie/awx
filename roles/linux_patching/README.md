@@ -1,7 +1,7 @@
 Role Name
 =========
 
-This role handles patching all US(currently) Linux Servers at MetLife.
+This role handles patching rhel servers only
 
 Role Variables
 --------------
