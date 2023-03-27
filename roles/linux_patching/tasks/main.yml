@@ -3,7 +3,7 @@
 # - update - runs update tasks
 # - always - always runs setup, check reboot flag and print reboot flag status
 # - never - never runs update or reboot tasks unless update tag is used
-# - service1 - conditionally restarts service1
+# - serviceone - conditionally restarts serviceone
 
 - setup:
     gather_subset: min
@@ -18,6 +18,138 @@
   register: autoreboot
   failed_when: "autoreboot.rc != 1 and autoreboot.rc != 0"
   ignore_errors: true
+  tags: always
+
+## Checks for any updates but does not update
+- name: Test if yum sees updates (no update done)
+  yum:
+    list=updates
+  register: yum_update_test
+  ignore_errors: true
+  timeout: 120
+  tags: always
+
+## Check for and fix any rpmdb corruption issues
+- name: Check for and fix potential rpmdb corruption issues
+  block:
+    - name: Stop ServiceOne (RHEL 6)
+      service:
+        name: ServiceOne
+        state: stopped
+      timeout: 15
+      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
+
+    - name: Stop serviceone (RHEL 7+)
+      systemd:
+        name: serviceone
+        state: stopped
+      timeout: 15
+      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "7")
+
+    - name: Stop rhsmcertd
+      service:
+        name: rhsmcertd
+        state: stopped
+      timeout: 15
+
+    - name: Find what is using subscription-manager (ok if failed)
+      shell:
+        cmd: grep "[[:digit:]]*" /var/run/rhsm/cert.pid
+      register: sub_man_pid
+      ignore_errors: true
+      changed_when: false
+      timeout: 15
+
+    - name: Attempt to kill what is using subscription-manager
+      block:
+        - name: Kill subscription-manager pid
+          shell:
+            cmd: kill -9 $(cat /var/run/rhsm/cert.pid)
+          register: kill_certpid
+          timeout: 15
+
+        - name: Remove rhsm pid if no process owns it (ok if failed)
+          shell:
+            cmd: rm -f /var/run/rhsm/cert.pid
+          when: 'kill_certpid.failed == true and kill_certpid.stderr is search("No such process")'
+          timeout: 15
+      when: sub_man_pid.failed == false
+      become: true
+      ignore_errors: true
+
+    - name: Rebuild RPMDB
+      block:
+        - name: Kill all rpm/yum commands
+          shell:
+            cmd: kill -9 $(ps -ef | grep -v grep | grep "rpm\|yum" | awk '{ if($3=1){ print $2 } }')
+          ignore_errors: true
+          timeout: 15
+
+        - name: remove dbenv lock file
+          file:
+            path: /var/lib/rpm/.dbenv.lock
+            state: absent
+          become: true
+          timeout: 15
+
+        - name: remove rpm lock file
+          file:
+            path: /var/lib/rpm/.rpm.lock
+            state: absent
+          become: true
+          timeout: 15
+
+        - name: backup rpmdb files
+          shell:
+            cmd: mv /var/lib/rpm/__db* /tmp/.
+          timeout: 30
+
+        - name: rebuild rpmdb
+          command:
+            cmd: rpm --rebuilddb
+          timeout: 180
+
+        - name: start rhsmcertd
+          service:
+            name: rhsmcertd
+            state: started
+          timeout: 15
+
+      rescue:
+        - name: restore rpmdb files
+          shell:
+            cmd: mv /tmp/__db* /var/lib/rpm
+          register: rpmdb_revert
+          timeout: 30
+
+        - name: successful rpmdb restore
+          fail:
+            msg: "Failed to rebuild rpmdb, db files restored successfully"
+          when: rpmdb_revert.failed == false
+          timeout: 30
+
+  always:
+    - name: Start ServiceOne (RHEL 6)
+      service:
+        name: ServiceOne
+        state: started
+      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
+      timeout: 15
+
+    - name: Start serviceone (RHEL 7+)
+      systemd:
+        name: serviceone
+        state: started
+      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "7")
+      timeout: 15
+
+    - name: Start rhsmcertd
+      service:
+        name: rhsmcertd
+        state: started
+      timeout: 15
+  when: yum_update_test.failed == true or yum_update_test.stdout is search("Cannot allocate memory") or yum_update_test.stdout is search("fatal region error detected")
+  become: true
   tags: always
 
 ## Run yum update. This updates everything on a system
@@ -78,15 +210,14 @@
 - name: Print VMs with autoreboot set to false
   when: autoreboot.stdout is search("FALSE")
   debug: msg="{{ ansible_hostname }} is not set to autoreboot but may have been updated and may need to be rebooted manually."
-  tags:
-    - always
+  tags: always
 
 ## Restart service1 on RHEL7 when called
-- name: Restart Service1
+- name: Restart ServiceOne
   systemd:
     state: restarted
-    name: service1
-  tags: [ never, service1 ]
+    name: serviceone
+  tags: [ never, serviceone ]
   when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "8" and yum_update_out.changed == true and reboot_needed.stdout_lines is search("Reboot should not be necessary")) or
         (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" and yum_update_out.changed == true and reboot_needed.stdout_lines is search("Reboot is probably not necessary"))
 
