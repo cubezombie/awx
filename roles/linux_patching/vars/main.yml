@@ -9,6 +9,10 @@ server_reboot_pre_delay: "0"
 server_reboot_post_delay: "60"
 server_reboot_timeout: "600"
 server_reboot_test_cmd: "whoami"
+to_15sec: "15"
+to_30sec: "30"
+to_120sec: "120"
+to_180sec: "180"
 
 
 ## Not working
