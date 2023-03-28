@@ -152,7 +152,7 @@
         name: rhsmcertd
         state: started
       timeout: 15
-  when: yum_update_test.failed == true or yum_update_test.stdout is search("Cannot allocate memory") or yum_update_test.stdout is search("fatal region error detected")
+  when: module_stdout is search("Berkeley") or module_stdout is search("Cannot allocate memory") or module_stdout is search("fatal region error detected")
   become: true
   tags: always
 
