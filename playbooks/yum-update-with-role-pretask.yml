@@ -2,7 +2,7 @@
 - hosts: all,!exclude,!rhel6
   gather_facts: false
   become: true
-  pretasks:
+  pre_tasks:
     - name: Stop ServiceOne
       systemd:
         state: stopped
