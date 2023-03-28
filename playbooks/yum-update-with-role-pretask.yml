@@ -1,0 +1,18 @@
+---
+- hosts: all,!exclude,!rhel6
+  gather_facts: false
+  become: true
+  pretasks:
+    - name: Stop ServiceOne
+      systemd:
+        state: stopped
+        name: serviceone
+
+  roles:
+    - roles/linux_patching 
+
+  post_tasks:
+    - name: Start ServiceOne
+      systemd:
+        state: started
+        name: serviceone
