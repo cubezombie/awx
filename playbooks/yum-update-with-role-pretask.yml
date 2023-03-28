@@ -1,5 +1,5 @@
 ---
-- hosts: all,!exclude,!rhel6
+- hosts: all,!lab_host_hypervisor,!rhel6
   gather_facts: false
   become: true
   pre_tasks:

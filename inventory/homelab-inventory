@@ -26,9 +26,5 @@ rhel8-02 ansible_host=10.10.10.104
 rhel9-01 ansible_host=10.10.10.117
 rhel9-02 ansible_host=10.10.10.118
 
-[pihole]
-ubuntu-pihole
-fedora-pihole
-
 [lab_host_hypervisor]
 homelab01
