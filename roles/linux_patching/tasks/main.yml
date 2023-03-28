@@ -29,6 +29,10 @@
   timeout: 120
   tags: always
 
+- name: print last output
+  debug:
+    var: yum_update_test
+
 ## Check for and fix any rpmdb corruption issues
 - name: Check for and fix potential rpmdb corruption issues
   block:
