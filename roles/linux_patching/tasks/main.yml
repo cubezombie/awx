@@ -29,9 +29,9 @@
   timeout: 120
   tags: always
 
-- name: print last output
-  debug:
-    var: yum_update_test
+#- name: print last output
+#  debug:
+#    var: yum_update_test
 
 ## Check for and fix any rpmdb corruption issues
 - name: Check for and fix potential rpmdb corruption issues
@@ -152,7 +152,7 @@
         name: rhsmcertd
         state: started
       timeout: 15
-  when: module_stdout is search("Berkeley") or module_stdout is search("Cannot allocate memory") or module_stdout is search("fatal region error detected")
+  when: yum_update_test.failed == true
   become: true
   tags: always
 
