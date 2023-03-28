@@ -7,6 +7,7 @@
       systemd:
         state: stopped
         name: serviceone
+      tags: always
 
   roles:
     - roles/linux_patching 
@@ -16,3 +17,4 @@
       systemd:
         state: started
         name: serviceone
+      tags: always
