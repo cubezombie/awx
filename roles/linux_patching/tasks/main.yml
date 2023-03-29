@@ -29,10 +29,6 @@
   timeout: 120
   tags: always
 
-#- name: print last output
-#  debug:
-#    var: yum_update_test
-
 ## Check for and fix any rpmdb corruption issues
 - name: Check for and fix potential rpmdb corruption issues
   block:
@@ -217,11 +213,11 @@
   tags: always
 
 ## Restart service1 on RHEL7 when called
-- name: Restart ServiceOne
-  systemd:
-    state: restarted
-    name: serviceone
-  tags: [ never, serviceone ]
-  when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "8" and yum_update_out.changed == true and reboot_needed.stdout_lines is search("Reboot should not be necessary")) or
-        (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" and yum_update_out.changed == true and reboot_needed.stdout_lines is search("Reboot is probably not necessary"))
+#- name: Restart ServiceOne
+#  systemd:
+#    state: restarted
+#    name: serviceone
+#  tags: [ never, serviceone ]
+#  when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "8" and yum_update_out.changed == true and reboot_needed.stdout_lines is search("Reboot should not be necessary")) or
+#        (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" and yum_update_out.changed == true and reboot_needed.stdout_lines is search("Reboot is probably not necessary"))
 
