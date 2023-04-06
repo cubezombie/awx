@@ -284,4 +284,5 @@
         shell:
           cmd: subscription-manager refresh
         ignore_errors: true
+        timeout: 15
 
