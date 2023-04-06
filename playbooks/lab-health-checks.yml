@@ -280,3 +280,8 @@
         register: clean_chk
         ignore_errors: yes
 
+      - name: Refresh subscription-manager
+        shell:
+          cmd: subscription-manager refresh
+        ignore_errors: true
+
