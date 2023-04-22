@@ -29,6 +29,14 @@
   timeout: 120
   tags: always
 
+- name: Verify RPMDB
+  shell:
+    cmd: rpm --verifydb
+  register: rpmdb_broken
+  ignore_errors: true
+  timeout: 120
+  tags: always
+
 ## Check for and fix any rpmdb corruption issues
 - name: Check for and fix potential rpmdb corruption issues
   block:
@@ -74,7 +82,6 @@
           when: 'kill_certpid.failed == true and kill_certpid.stderr is search("No such process")'
           timeout: 15
       when: sub_man_pid.failed == false
-      become: true
       ignore_errors: true
 
     - name: Rebuild RPMDB
@@ -89,14 +96,12 @@
           file:
             path: /var/lib/rpm/.dbenv.lock
             state: absent
-          become: true
           timeout: 15
 
         - name: remove rpm lock file
           file:
             path: /var/lib/rpm/.rpm.lock
             state: absent
-          become: true
           timeout: 15
 
         - name: backup rpmdb files
@@ -148,8 +153,7 @@
         name: rhsmcertd
         state: started
       timeout: 15
-  when: yum_update_test.failed == true
-  become: true
+  when: yum_update_test.failed == true or rpmdb_broken.failed == true
   tags: always
 
 ## Run yum update. This updates everything on a system
