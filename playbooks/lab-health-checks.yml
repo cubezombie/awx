@@ -15,18 +15,12 @@
       systemd:
         state: started
         name: taniumclient
-      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7")
+      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "7")
 
   tasks:
-#      - setup:
-#          gather_subset: min
-#          gather_timeout: 60
-#          filter:
-#            - ansible_distribution*
-#            - ansible_hostname
-
       - name: Check Reboot flag
-        shell: "grep -E 'TRUE|FALSE|PT' /opt/Tanium/TaniumClient/Tools/CustomTags.txt"
+        shell:
+          cmd: grep -E 'TRUE|FALSE|PT' /opt/Tanium/TaniumClient/Tools/CustomTags.txt
         register: autoreboot
         failed_when: false
         ignore_errors: true
@@ -37,6 +31,13 @@
         debug: msg="{{ ansible_hostname }} is missing the CustomTags.txt file. Open incident with the Patch Engineering Team"
         ignore_errors: yes
         timeout: 60
+
+      - name: Verify RPMDB
+        shell:
+          cmd: rpm --verifydb
+        register: rpmd_broken
+        ignore_errors: true
+        timeout: 120
 
       - name: Check for any generic yum errors
         shell: yum update --assumeno
@@ -86,7 +87,8 @@
         timeout: 60
 
       - name: Check RHSM Base URL
-        shell: grep -i 'subscription.rhsm.redhat.com' /etc/rhsm/rhsm.conf
+        shell:
+          cmd: grep -i 'subscription.rhsm.redhat.com' /etc/rhsm/rhsm.conf
         register: rhsm_base_url
         ignore_errors: yes
         timeout: 60
@@ -99,7 +101,8 @@
         timeout: 60
 
       - name: Check if repos are enabled
-        shell: subscription-manager repos --list-enabled
+        shell:
+          cmd: subscription-manager repos --list-enabled
         register: repos_enabled
         timeout: 60
         ignore_errors: yes
@@ -140,14 +143,12 @@
             when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6")
             timeout: 60
 
-          - name: Stop taniumclient (RHEL 7 or 8)
+          - name: Stop taniumclient (RHEL 7+)
             service:
               name: taniumclient
               state: stopped
             timeout: 60
-            when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or
-                  (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8") or
-                  (ansible_distribution == "RedHat" and ansible_distribution_major_version == "9")
+            when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "7") or
 
           - name: Stop rhsmcertd
             service:
@@ -219,6 +220,11 @@
                   state: started
                 timeout: 60
 
+              - name: Verify RPMDB
+                shell:
+                  cmd: rpm --verifydb
+                when: rpmdb_broken.failed == true
+
               - name: See if rpm is working again
                 command:
                   cmd: rpm -qa redhat-release*
@@ -259,9 +265,7 @@
             service:
               name: taniumclient
               state: started
-            when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7") or
-                  (ansible_distribution == "RedHat" and ansible_distribution_major_version == "8") or
-                  (ansible_distribution == "RedHat" and ansible_distribution_major_version == "9")
+            when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "7")
             timeout: 60
 
           - name: Start rhsmcertd
@@ -269,7 +273,7 @@
               name: rhsmcertd
               state: started
             timeout: 60
-        when: rpm_check.failed == true or subscription_manager_repos.failed == true
+        when: rpm_check.failed == true or subscription_manager_repos.failed == true or rpmdb_broken.failed == true
         become: yes
 
       - name: Clean yum cache
