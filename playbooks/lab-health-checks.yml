@@ -35,7 +35,7 @@
       - name: Verify RPMDB
         shell:
           cmd: rpm --verifydb
-        register: rpmd_broken
+        register: rpmdb_broken
         ignore_errors: true
         timeout: 120
 
