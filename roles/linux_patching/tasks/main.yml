@@ -114,6 +114,11 @@
             cmd: rpm --rebuilddb
           timeout: 180
 
+        - name: verify rpmdb
+          shell:
+            cmd: rpm --verifydb
+          timeout: 120
+
         - name: start rhsmcertd
           service:
             name: rhsmcertd
