@@ -33,9 +33,10 @@
     - name: Print Last Update and Reboot RHEL6/7
       when: (ansible_distribution == "RedHat" and ansible_distribution_major_version <= "7")
       debug:
-        msg: {{ ansible_hostname }} last updated on {{ last_update7.stdout }}, last rebooted on {{ last_reboot7.stdout }}
+        msg: "{{ ansible_hostname }} last updated on {{ last_update7.stdout }}, last rebooted on {{ last_reboot7.stdout }}"
 
     - name: Print Last Update and Reboot on RHEL8
       when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "8")
       debug:
-        msg: {{ ansible_hostname }} last updated on {{ last_update8.stdout }}, last rebooted on {{ last_reboot8.stdout }}
+        msg: "{{ ansible_hostname }} last updated on {{ last_update8.stdout }}, last rebooted on {{ last_reboot8.stdout }}"
+
