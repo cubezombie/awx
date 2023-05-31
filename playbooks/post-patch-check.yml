@@ -24,7 +24,7 @@
     - name: Check Last Update RHEL8
       shell: yum history | grep "E, I, U" | head -n 1 | awk '{ print $4 }'
       when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "8")
-      register: last_reboot8
+      register: last_update8
 
     - name: Check Last Reboot RHEL8
       shell: "last reboot | awk '{ print $6, $7, $8 }' | head -n 1"
