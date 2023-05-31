@@ -11,7 +11,7 @@
           - date_time
 
     - name: Check Last Update RHEL6/7
-      shell: "yum history list all | grep "E, I, U" | grep -i "root" | head -n 1 | awk '{ print $6 }'"
+      shell: yum history list all | grep "E, I, U" | grep -i "root" | head -n 1 | awk '{ print $6 }'
       when: (ansible_distribution == "RedHat" and ansible_distribution_major_version <= "7")
       register: last_update7
 
@@ -21,7 +21,7 @@
       register: last_reboot7
 
     - name: Check Last Update RHEL8
-      shell: "yum history | grep "E, I, U" | head -n 1 | awk '{ print $4 }'"
+      shell: yum history | grep "E, I, U" | head -n 1 | awk '{ print $4 }'
       when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "8")
       register: last_reboot8
 
