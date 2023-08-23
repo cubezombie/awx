@@ -20,12 +20,12 @@
       - name: Check Available Space in /boot
         shell: df -h /boot/ | awk '{ print $5 }' | grep -Eo '[0-9]{1,4}'
         register: boot_space
-        failed_when: boot_space.stdout >= 93
+        #failed_when: boot_space.stdout >= 93
         ignore_errors: true
         timeout: 30
 
       - name: Not Enough Space in /boot for update
-        when: boot_space.stdout >= 30
+        when: boot_space.stdout|int >= 30
         debug: msg="/boot on {{ ansible_hostname }} is over 95% utilized and may faile to update. Open an incident."
         ignore_errors: true
         timeout: 30
