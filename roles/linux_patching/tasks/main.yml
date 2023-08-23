@@ -29,7 +29,7 @@
         state: directory
 
     - name: Find and move all repo files in /etc/yum.repos.d except redhat.repo
-      shell: mv $(find /etc/yum.repos.d/ -type f | grep -v redhat.repo) /etc/yum.repos.d/temp
+      shell: mv $(find /etc/yum.repos.d/ -type f | grep -v redhat.repo) /etc/yum.repos.d/temp/
   ignore_errors: true
   tags: always
 
