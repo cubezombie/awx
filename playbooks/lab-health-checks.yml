@@ -10,11 +10,11 @@
           - ansible_distribution*
           - ansible_hostname
 
-    - name: Start Dummy Service
-      systemd:
-        state: started
-        name: serviceone
-      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "7")
+#    - name: Start Dummy Service
+#      systemd:
+#        state: started
+#        name: serviceone
+#      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "7")
 
   tasks:
       - name: Check Reboot flag
@@ -116,7 +116,6 @@
       - name: See if rpm is working
         command:
           cmd: rpm -qa redhat-release*
-        become: yes
         register: rpm_check
         failed_when: rpm_check.stderr is search("Berkeley") or repos_enabled.changed == False or repos_enabled.stderr is search("PANIC") or rpm_check.stderr is search("Cannot allocate memory")
         changed_when: false
@@ -126,7 +125,6 @@
       - name: See if repos times out
         command:
           cmd: subscription-manager repos --list-enabled
-        become: yes
         register: subscription_manager_repos
         failed_when: subscription_manager_repos.stderr is search("Berkeley")
         changed_when: false
@@ -158,7 +156,6 @@
           - name: Attempt to find what is using subscription-manager
             shell:
               cmd: grep "[[:digit:]]*" /var/run/rhsm/cert.pid
-            become: yes
             register: sub_man_pid
             ignore_errors: yes
             changed_when: false
@@ -170,13 +167,11 @@
                 shell:
                   cmd: kill -9 $(cat /var/run/rhsm/cert.pid)
                 register: kill_certpid
-                become: yes
                 timeout: 60
 
               - name: Remove /var/run/rhsm/cert.pid if process doesn't exist
                 shell:
                   cmd: rm /var/run/rhsm/cert.pid
-                become: yes
                 when: 'kill_certpid.failed == true and kill_certpid.stderr is search("No such process")'
             when: sub_man_pid.failed == false
             ignore_errors: yes
@@ -193,14 +188,12 @@
                 file:
                   path: /var/lib/rpm/.dbenv.lock
                   state: absent
-                become: yes
                 timeout: 60
 
               - name: Remove /var/lib/rpm/.rpm.lock
                 file:
                   path: /var/lib/rpm/.rpm.lock
                   state: absent
-                become: yes
                 timeout: 60
 
               - name: Back rpmdb files
@@ -234,7 +227,6 @@
               - name: See if repos works
                 command:
                   cmd: subscription-manager repos
-                become: yes
                 register: subscription_manager_repos_retry
                 when: subscription_manager_repos.failed == true
                 failed_when: subscription_manager_repos_retry.stderr is search("Berkeley")
