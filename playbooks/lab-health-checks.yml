@@ -26,7 +26,8 @@
 
       - name: Not Enough Space in /boot for update
         when: boot_space.stdout|int >= 30
-        debug: msg="/boot on {{ ansible_hostname }} is over 95% utilized and may faile to update. Open an incident."
+        failed_when: boot_space.stdout|int >= 30
+        debug: msg="/boot on {{ ansible_hostname }} is over 95% utilized and may fail to update. Open an incident."
         ignore_errors: true
         timeout: 30
 
