@@ -1,6 +1,7 @@
 ---
 ## Tags in use
 # - update - runs update tasks
+# - reboot - reboots server if custom tag is TRUE and updates require a reboot
 # - always - always runs setup, check reboot flag and print reboot flag status
 # - never - never runs update or reboot tasks unless update tag is used
 # - serviceone - conditionally restarts serviceone
@@ -214,7 +215,7 @@
     test_command: "{{ server_reboot_test_cmd }}"
   ignore_errors: true
   when: (ansible_distribution == "RedHat" and ansible_distribution_major_version == "6" and reboot_needed6.rc == 0 and autoreboot.stdout is search("TRUE-PT"))
-  tags: [ never, update ]
+  tags: [ never, reboot ]
 
 ## Reboot RHEL7+ VMs
 - name: Reboot RHEL7+ VMs
@@ -226,7 +227,7 @@
     test_command: "{{ server_reboot_test_cmd }}"
   ignore_errors: true
   when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "7" and reboot_needed.rc == 1 and autoreboot.stdout is search("TRUE-PT"))
-  tags: [ never, update ]
+  tags: [ never, reboot ]
 
 ## Re-enable all repos
 - name: Re-enable all repos in /etc/yum.repos.d
