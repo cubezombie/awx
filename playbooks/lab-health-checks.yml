@@ -1,7 +1,7 @@
 - hosts: all
-  gather_facts: no
+  gather_facts: false
   ignore_unreachable: true
-  become: yes
+  become: true
   pre_tasks:
     - setup:
         gather_subset: min
@@ -55,7 +55,7 @@
       - name: Missing Reboot flag
         when: autoreboot.rc == 2
         debug: msg="{{ ansible_hostname }} is missing the CustomTags.txt file. Open incident with the Patch Engineering Team"
-        ignore_errors: yes
+        ignore_errors: true
         timeout: 60
 
       - name: Verify RPMDB
@@ -69,13 +69,13 @@
         shell: yum update --assumeno
         register: yum_generic_error
         failed_when: false
-        ignore_errors: yes
+        ignore_errors: true
         timeout: 60
 
       - name: Generic yum errors found
         when: yum_generic_error.stdout is search("Error")
         debug: msg="There is a yum error that will prevent the update. Open incident with Server Linux Operations"
-        ignore_errors: yes
+        ignore_errors: true
         timeout: 60
 
       - name: Find yumtx files in /tmp
@@ -83,7 +83,7 @@
           paths: /tmp/
           patterns: '*.yumtx'
           age: 1m
-          recurse: no
+          recurse: false
         register: yumtx
         timeout: 60
 
@@ -100,7 +100,7 @@
           file_type: directory
           patterns: 'yum-*'
           age: 1m
-          recurse: no
+          recurse: false
         register: useryum
         timeout: 60
 
@@ -109,21 +109,21 @@
           path: "{{ item.path }}"
           state: absent
         with_items: "{{ useryum.files }}"
-        ignore_errors: yes
+        ignore_errors: true
         timeout: 60
 
       - name: Check RHSM Base URL
         shell:
           cmd: grep -i 'subscription.rhsm.redhat.com' /etc/rhsm/rhsm.conf
         register: rhsm_base_url
-        ignore_errors: yes
+        ignore_errors: true
         timeout: 60
 
       - name: Wrong RHSM Base URL
         when: rhsm_base_url.rc == 1
         failed_when: rhsm_base_url.rc == 1
         debug: msg="Wrong satellite server configured for this host. Open INC with Server Linux Operations"
-        ignore_errors: yes
+        ignore_errors: true
         timeout: 60
 
       - name: Check if repos are enabled
@@ -131,13 +131,13 @@
           cmd: subscription-manager repos --list-enabled
         register: repos_enabled
         timeout: 60
-        ignore_errors: yes
+        ignore_errors: true
 
       - name: No repos enabled
         when: repos_enabled.stdout is search("There were no available repositories matching the specified criteria.")
         failed_when: repos_enabled.stdout is search("There were no available repositories matching the specified criteria.") or repos_enabled.stdout is search("This system has no repositories available through subscriptions.")
         debug: msg="No repos enabled. Open INC with Server Linux Operations"
-        ignore_errors: yes
+        ignore_errors: true
         timeout: 60
 
       - name: See if rpm is working
@@ -146,7 +146,7 @@
         register: rpm_check
         failed_when: rpm_check.stderr is search("Berkeley") or repos_enabled.changed == False or repos_enabled.stderr is search("PANIC") or rpm_check.stderr is search("Cannot allocate memory")
         changed_when: false
-        ignore_errors: yes
+        ignore_errors: true
         timeout: 60
 
       - name: See if repos times out
@@ -155,7 +155,7 @@
         register: subscription_manager_repos
         failed_when: subscription_manager_repos.stderr is search("Berkeley")
         changed_when: false
-        ignore_errors: yes
+        ignore_errors: true
         timeout: 60
 
       - name: Rebuild rpmdb if broken
@@ -184,7 +184,7 @@
             shell:
               cmd: grep "[[:digit:]]*" /var/run/rhsm/cert.pid
             register: sub_man_pid
-            ignore_errors: yes
+            ignore_errors: true
             changed_when: false
             timeout: 60
 
@@ -201,14 +201,14 @@
                   cmd: rm /var/run/rhsm/cert.pid
                 when: 'kill_certpid.failed == true and kill_certpid.stderr is search("No such process")'
             when: sub_man_pid.failed == false
-            ignore_errors: yes
+            ignore_errors: true
 
           - name: Rebuild tasks
             block:
               - name: Kill all rpm/yum commands
                 shell:
                   cmd: kill -9 $(ps -ef | grep -v grep | grep "rpm\|yum" | awk '{ if($3=1){ print $2 } }')
-                ignore_errors: yes
+                ignore_errors: true
                 timeout: 60
 
               - name: Remove /var/lib/rpm/.dbenv.lock
@@ -292,7 +292,7 @@
               state: started
             timeout: 60
         when: rpm_check.failed == true or subscription_manager_repos.failed == true or rpmdb_broken.failed == true
-        become: yes
+        become: true
 
       - name: Clean yum cache
         file:
@@ -300,7 +300,7 @@
           state: absent
         timeout: 120
         register: clean_chk
-        ignore_errors: yes
+        ignore_errors: true
 
       - name: Refresh subscription-manager
         shell:
