@@ -24,8 +24,8 @@
         timeout: 30
 
       - name: Not Enough Space in /boot for update
-        when: boot_space.stdout|int >= 30
-        failed_when: boot_space.stdout|int >= 30
+        when: boot_space.stdout|int >= 95
+        failed_when: boot_space.stdout|int >= 95
         debug: msg="/boot on {{ ansible_hostname }} is over 95% utilized and may fail to update. Open an incident."
         ignore_errors: true
         timeout: 30
@@ -37,8 +37,8 @@
         timeout: 30
 
       - name: Not Enough Space in /var for update
-        when: var_space.stdout|int >= 10
-        failed_when: boot_space.stdout|int >= 10
+        when: var_space.stdout|int >= 95
+        failed_when: boot_space.stdout|int >= 95
         debug: msg="/var on {{ ansible_hostname }} is over 95% utilized and may fail to update. Open an incident."
         ignore_errors: true
         timeout: 30
@@ -46,7 +46,7 @@
 
       - name: Check Reboot flag
         shell:
-          cmd: grep -E 'TRUE|FALSE|PT' /opt/Tanium/TaniumClient/Tools/CustomTags.txt
+          cmd: grep -E 'TRUE|FALSE' /opt/Tanium/TaniumClient/Tools/CustomTags.txt
         register: autoreboot
         failed_when: false
         ignore_errors: true
