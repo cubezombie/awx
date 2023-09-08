@@ -22,9 +22,14 @@
   ignore_errors: true
   tags: always
 
-- name: debugging
-  debug:
-    var: autoreboot
+- name: Missing custom reboot flag
+  fail:
+    msg: "{{ ansible_hostname }} is missing a custom tag"
+  when: autoreboot.failed == true
+
+#- name: debugging
+#  debug:
+#    var: autoreboot
 
 ## Disable all repos except redhat.repo
 - name: Temporarily disable all yum repos except redhat.repo
