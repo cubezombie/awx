@@ -21,6 +21,10 @@
   ignore_errors: true
   tags: always
 
+- name: debugging
+  debug:
+    var: autoreboot
+
 ## Disable all repos except redhat.repo
 - name: Temporarily disable all yum repos except redhat.repo
   block:
