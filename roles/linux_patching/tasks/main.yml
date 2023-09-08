@@ -17,7 +17,7 @@
 - name: Check Reboot Flag
   shell: "grep -E 'TRUE|FALSE' {{ custom_flag_path }}"
   register: autoreboot
-  failed_when: "autoreboot.rc != 1 and autoreboot.rc != 0"
+#  failed_when: "autoreboot.rc != 1 and autoreboot.rc != 0"
 #  failed_when: autoreboot.failed == true 
   ignore_errors: true
   tags: always
