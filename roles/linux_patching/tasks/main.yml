@@ -43,7 +43,7 @@
   shell: "yum-config-manager --disable {{ item }}"
   with_items: "{{ non_rhel_repos.stdout_lines }}"
   tags: [ update, hva ]
-  ignore_erros: true
+  ignore_errors: true
 
 ## Checks for any updates but does not update
 - name: Test if yum sees updates (no update done)
