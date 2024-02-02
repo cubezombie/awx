@@ -31,18 +31,19 @@
 #  debug:
 #    var: autoreboot
 
-## Disable all repos except redhat.repo
-#- name: Temporarily disable all yum repos except redhat.repo
-#  block:
-#    - name: Create temp dir in /etc/yum.repos.d/
-#      file:
-#        path: /etc/yum.repos.d/temp
-#        state: directory
-#
-#    - name: Find and move all repo files in /etc/yum.repos.d except redhat.repo
-#      shell: mv $(find /etc/yum.repos.d/ -type f | grep -v redhat.repo) /etc/yum.repos.d/temp/
-#  ignore_errors: true
-#  tags: always
+## Find non-RHEL repos
+- name: Find non-RHEL repos
+  shell: "yum -q repolist | grep -vE '{{ supported_repos_search }}' | awk '{ print $1 }' | tail -n +2"
+  register: non_rhel_repos
+  tags: [ update,hva ]
+  ignore_errors: true
+
+## Disable non-RHEL repos
+- name: Disable non-RHEL repos
+  shell: "yum-config-manager --disable {{ item }}"
+  with_items: "{{ non_rhel_repos.stdout_lines }}"
+  tags: [ update, hva ]
+  ignore_erros: true
 
 ## Checks for any updates but does not update
 - name: Test if yum sees updates (no update done)
@@ -241,18 +242,12 @@
   when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "7" and reboot_needed.rc == 1 and autoreboot.stdout is search("TRUE-PT"))
   tags: [ never, reboot ]
 
-## Re-enable all repos
-#- name: Re-enable all repos in /etc/yum.repos.d
-#  block:
-#    - name: Move repo files back to /etc/yum.repos.d
-#      shell: mv $(find /etc/yum.repos.d/temp/ -type f | grep repo) /etc/yum.repos.d/
-#
-#    - name: Remove temp dir in /etc/yum.repos.d
-#      file:
-#        path: /etc/yum.repos.d/temp
-#        state: absent
-#  ignore_errors: true
-#  tags: always
+## Re-enable non-rhel repos
+- name: Re-enable non-RHEL repos
+  shell: "yum-config-manager --enable {{ item }}"
+  with_items: "{{ non_rhel_repos.stdout_lines }}"
+  tags: [ update, hva ]
+  ignore_errors: true
 
 ## Print hosts who have autoreboot set to false
 - name: Print VMs with autoreboot set to false

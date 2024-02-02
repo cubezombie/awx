@@ -13,6 +13,7 @@ to_15sec: "15"
 to_30sec: "30"
 to_120sec: "120"
 to_180sec: "180"
+supported_repos_search: "rhel-6-server|rhel-7-server|rhel-8-for|satellite-client-6-for-rhel8"
 
 
 ## Not working
