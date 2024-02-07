@@ -187,8 +187,6 @@
   register: yum_update_out
   timeout: "{{ yum_update_timeout }}"
   yum:
-    disablerepo: "*"
-    enablerepo: redhat
     name: "*"
     state: latest
   when: (autoreboot.stdout is search("TRUE") or autoreboot.stdout is search("FALSE"))
