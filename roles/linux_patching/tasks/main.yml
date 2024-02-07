@@ -129,6 +129,7 @@
           shell:
             cmd: mv /var/lib/rpm/__db* /tmp/.
           timeout: 30
+          ignore_errors: true
 
         - name: rebuild rpmdb
           command:
