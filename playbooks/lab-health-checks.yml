@@ -304,7 +304,7 @@
         timeout: 120
         register: clean_chk8
         ignore_errors: true
-        when: (ansible_distribution == "RedHat" and ansible_distribution_major_version <= "8")
+        when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "8")
 
       - name: Refresh subscription-manager
         shell:
