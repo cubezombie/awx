@@ -10,12 +10,6 @@
           - ansible_distribution*
           - ansible_hostname
 
-#    - name: Start Dummy Service
-#      systemd:
-#        state: started
-#        name: serviceone
-#      when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "7")
-
   tasks:
       - name: Check Available Space in /boot
         shell: df -h /boot/ | awk '{ print $5 }' | grep -Eo '[0-9]{1,4}'
@@ -24,9 +18,9 @@
         timeout: 30
 
       - name: Not Enough Space in /boot for update
-        when: boot_space.stdout|int >= 95
-        failed_when: boot_space.stdout|int >= 95
-        debug: msg="/boot on {{ ansible_hostname }} is over 95% utilized and may fail to update. Open an incident."
+        when: boot_space.stdout|int >= 45
+        failed_when: boot_space.stdout|int >= 45
+        debug: msg="/boot on {{ ansible_hostname }} is over 45% utilized and may fail to update. Open an incident."
         ignore_errors: true
         timeout: 30
 
@@ -37,9 +31,9 @@
         timeout: 30
 
       - name: Not Enough Space in /var for update
-        when: var_space.stdout|int >= 95
-        failed_when: boot_space.stdout|int >= 95
-        debug: msg="/var on {{ ansible_hostname }} is over 95% utilized and may fail to update. Open an incident."
+        when: var_space.stdout|int >= 45
+        failed_when: boot_space.stdout|int >= 45
+        debug: msg="/var on {{ ansible_hostname }} is over 45% utilized and may fail to update. Open an incident."
         ignore_errors: true
         timeout: 30
 
@@ -294,12 +288,20 @@
         when: rpm_check.failed == true or subscription_manager_repos.failed == true or rpmdb_broken.failed == true
         become: true
 
-      - name: Clean yum cache
+      - name: Clean yum cache RHEL6/RHEL7
         file:
           path: /var/cache/yum
           state: absent
         timeout: 120
-        register: clean_chk
+        register: clean_chk7
+        ignore_errors: true
+
+      - name: Clean yum cache RHEL8+
+        file:
+          path: /var/cache/dnf
+          state: absent
+        timeout: 120
+        register: clean_chk8
         ignore_errors: true
 
       - name: Refresh subscription-manager

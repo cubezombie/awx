@@ -5,7 +5,6 @@
 # - hva - updates and reboots if custom tag is TRUE and updates require a reboot
 # - always - always runs setup, check reboot flag and print reboot flag status
 # - never - never runs update or reboot tasks unless update tag is used
-# - serviceone - conditionally restarts serviceone
 
 - setup:
     gather_subset: min
@@ -28,13 +27,9 @@
     msg: "{{ ansible_hostname }} is missing a custom tag"
   when: autoreboot.failed == true
 
-#- name: debugging
-#  debug:
-#    var: autoreboot
-
 ## Find non-RHEL repos
 - name: Find non-RHEL repos
-  shell: "yum -q repolist | grep -vE '{{ supported_repos_search }}' | awk '{ print $1 }' | tail -n +2"
+  shell: "yum -q repolist | grep -vE '{{ supported_repos_search }}' | awk '{ print $1 }' | tr -d '!' | tail -n +2"
   register: non_rhel_repos
   tags: [ update, hva ]
   ignore_errors: true
@@ -255,13 +250,4 @@
   when: autoreboot.stdout is search("FALSE")
   debug: msg="{{ ansible_hostname }} is not set to autoreboot but may have been updated and may need to be rebooted manually."
   tags: always
-
-## Restart service1 on RHEL7 when called
-#- name: Restart ServiceOne
-#  systemd:
-#    state: restarted
-#    name: serviceone
-#  tags: [ never, serviceone ]
-#  when: (ansible_distribution == "RedHat" and ansible_distribution_major_version >= "8" and yum_update_out.changed == true and reboot_needed.stdout_lines is search("Reboot should not be necessary")) or
-#        (ansible_distribution == "RedHat" and ansible_distribution_major_version == "7" and yum_update_out.changed == true and reboot_needed.stdout_lines is search("Reboot is probably not necessary"))
 
