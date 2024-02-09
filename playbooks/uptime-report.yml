@@ -7,10 +7,10 @@
 
   tasks:
     - setup:
-      gather_subset: min
-      gather_timeout: 180
-      filter:
-       - ansible_hostname
+        gather_subset: min
+        gather_timeout: 180
+        filter:
+         - ansible_hostname
 
     - name: Gather server uptime
       shell: |
