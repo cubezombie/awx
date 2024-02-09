@@ -47,8 +47,8 @@
       delegate_to: localhost
 
     - name: Write uptime info to csv
-      hosts: rhel7-01
       lineinfile:
         insertafter: EOF
         dest: "{{ ureport_path }}/{{ ureport_name }}"
         line: "{{ uptime_out }}"
+
