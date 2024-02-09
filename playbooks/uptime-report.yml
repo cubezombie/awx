@@ -42,8 +42,8 @@
 
     - name: Parse uptime info
       set_fact:
-      uptime_out: >
-        {{ server_uptime.stdout_lines }}
+        uptime_out: >
+          {{ server_uptime.stdout_lines }}
       delegate_to: localhost
 
     - name: Write uptime info to csv
