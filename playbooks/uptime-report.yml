@@ -1,0 +1,54 @@
+---
+- hosts: all
+  gather_facts: false
+  vars:
+    ureport_name: "Uptime-Report-{{ date }}.csv"
+    ureport_path: "/data/Reports/Uptime/"
+
+  tasks:
+    - setup:
+      gather_subset: min
+      gather_timeout: 180
+      filter:
+       - ansible_hostname
+
+    - name: Gather server uptime
+      shell: |
+        export upSeconds="$(cat /proc/uptime | grep -o '^[0-9]\+')"
+        export upDays=$((${upSeconds} / 84600))
+        if [ "${upDays}" -gt "90" ]; then
+         echo "{{ ansible_hostname }},${upDays},Non-Compliant"
+        else
+         echo "{{ ansible_hostname }},${upDays},Compliant"
+        fi
+      ignore_errors: true
+      register: server_uptime
+
+    - name: Create filename
+      set_fact: date="{{lookup('pipe','date +%Y%m%d')}}"
+      run_once: true
+      connection: local
+      delegate_to: localhost
+
+    - name: Create csv file with headers
+      lineinfile:
+        dest: "{{ ureport_path }}/{{ ureport_name }}"
+        line:
+          hostname,uptime,compliance_status
+        create: true
+        state: present
+      connection: local
+      delegate_to: localhost
+
+    - name: Parse uptime info
+      set_fact:
+      uptime_out: >
+        {{ server_uptime.stdout_lines }}
+      delegate_to: localhost
+
+    - name: Write uptime info to csv
+      hosts: rhel7-01
+      lineinfile:
+        insertafter: EOF
+        dest: "{{ ureport_path }}/{{ ureport_name }}"
+        line: "{{ uptime_out }}"
