@@ -37,8 +37,8 @@
           hostname,uptime,compliance_status
         create: true
         state: present
-      connection: local
-      delegate_to: localhost
+      #connection: local
+      delegate_to: rhel7-01
 
     - name: Parse uptime info
       set_fact:
