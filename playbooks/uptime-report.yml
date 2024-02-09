@@ -51,4 +51,5 @@
         insertafter: EOF
         dest: "{{ ureport_path }}/{{ ureport_name }}"
         line: "{{ uptime_out }}"
+      delegate_to: rhel7-01
 
