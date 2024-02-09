@@ -12,7 +12,7 @@
         filter:
          - ansible_hostname
 
-    - name: Gather server uptime
+    - name: Gather server uptime and determine compliance
       shell: |
         export upSeconds="$(cat /proc/uptime | grep -o '^[0-9]\+')"
         export upDays=$((${upSeconds} / 84600))
@@ -46,7 +46,7 @@
           {{ server_uptime.stdout_lines }}
       delegate_to: localhost
 
-    - name: Write uptime info to csv
+    - name: Write uptime info to csv on remote server
       lineinfile:
         insertafter: EOF
         dest: "{{ ureport_path }}/{{ ureport_name }}"
