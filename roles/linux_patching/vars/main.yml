@@ -4,7 +4,7 @@ custom_flag_path: /opt/Tanium/TaniumClient/Tools/CustomTags.txt
 yum_update_timeout: "3600"
 chk_reboot_rhel6_svc: "/usr/bin/needs-restarting | grep -E 'sshd|init'"
 chk_reboot_rhel7_svc: "/usr/bin/needs-restarting -r"
-console_reboot_msg: "Reboot initiated by Ansible for BAU monthly patching activity"
+console_reboot_msg: "Reboot initiated by Ansible for BAU monthly patching activity authorized by {{ change_id }}"
 server_reboot_pre_delay: "0"
 server_reboot_post_delay: "60"
 server_reboot_timeout: "600"
