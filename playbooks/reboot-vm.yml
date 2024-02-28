@@ -5,7 +5,8 @@
   become: true
 
   tasks:
-    - name: Reboot Server (Wait for 5 min)
+    - name: Reboot Server (Wait for 20 min)
       reboot:
-        reboot_timeout: 300
+        msg: "Reboot initiated by Ansible authorized by {{ change_id }}"
+        reboot_timeout: 1200
 
