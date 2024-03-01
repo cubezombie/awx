@@ -13,6 +13,7 @@
         filter:
           - ansible_distribution*
           - ansible_hostname
+          - ansible_mounts
 
   tasks:
       - name: Check Available Space in /boot
