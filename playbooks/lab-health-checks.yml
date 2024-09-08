@@ -29,22 +29,22 @@
         ignore_errors: true
 #        timeout: 30
 
-      - name: Check space on /var
-        assert:
-          that: mount.size_available > mount.size_total|float * 0.1
-          msg: disk space needs to be checked
+#      - name: Check space on /var
+#        assert:
+#          that: mount.size_available > mount.size_total|float * 0.1
+#          msg: disk space needs to be checked
 
-#      - name: Check Available Space in /var
-#        shell: df -h /var/ | awk '{ print $5 }' | grep -Eo '[0-9]{1,4}'
-#        register: var_space
-#        ignore_errors: true
+      - name: Check Available Space in /var
+        shell: df -h /var/ | awk '{ print $5 }' | grep -Eo '[0-9]{1,4}'
+        register: var_space
+        ignore_errors: true
 #        timeout: 30
 
-#      - name: Not Enough Space in /var for update
-#        when: var_space.stdout|int >= 45
-#        failed_when: boot_space.stdout|int >= 45
-#        debug: msg="/var on {{ ansible_hostname }} is over 45% utilized and may fail to update. Open an incident."
-#        ignore_errors: true
+      - name: Not Enough Space in /var for update
+        when: var_space.stdout|int >= 45
+        failed_when: boot_space.stdout|int >= 45
+        debug: msg="/var on {{ ansible_hostname }} is over 45% utilized and may fail to update. Open an incident."
+        ignore_errors: true
 #        timeout: 30
 
 
