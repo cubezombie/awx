@@ -56,6 +56,20 @@
         ignore_errors: true
 #        timeout: 60
 
+      ## Find non-RHEL repos
+      - name: Find non-RHEL repos
+        shell: "yum -q repolist | grep -vE '{{ supported_repos_search }}' | awk '{ print $1 }' | tr -d '!' | tail -n +2"
+        register: non_rhel_repos
+        tags: [ update, hva, disablerepoa ]
+        ignore_errors: true
+
+      ## Disable non-RHEL repos
+      - name: Disable non-RHEL repos
+        shell: "yum-config-manager --disable {{ item }}"
+        with_items: "{{ non_rhel_repos.stdout_lines }}"
+        tags: [ update, hva, disablerepo ]
+        ignore_errors: true
+
       - name: Missing Reboot flag
         when: autoreboot.rc == 2
         debug: msg="{{ ansible_hostname }} is missing the CustomTags.txt file. Open incident with the Patch Engineering Team"
