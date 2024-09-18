@@ -61,7 +61,7 @@
       - name: Find non-RHEL repos
         shell: "yum -q repolist | grep -vE '{{ supported_repos_search }}' | awk '{ print $1 }' | tr -d '!' | tail -n +2"
         register: non_rhel_repos
-        tags: [ update, hva, disablerepoa ]
+        tags: [ update, hva, disablerepo ]
         ignore_errors: true
 
       ## Disable non-RHEL repos
