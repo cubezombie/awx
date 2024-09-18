@@ -4,7 +4,8 @@
   become: true
 
   vars:
-    mount: "{{ ansible_mounts | selectattr('mount','equalto',mountname) | list | first }}"
+    #mount: "{{ ansible_mounts | selectattr('mount','equalto',mountname) | list | first }}"
+    supported_repos_search: "rhel-6-server|rhel-7-server|rhel-8-for|rhel-9-for|satellite-client-6-for-rhel8"
 
   pre_tasks:
     - setup:
