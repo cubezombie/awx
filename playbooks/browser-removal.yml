@@ -1,13 +1,20 @@
 ---
 - name: Remove Firefox and Google Chrome
   hosts: all
-  become: yes
+  become: true
+  gather_facts: false
   vars:
     browser_packages:
       - "firefox"
       - "google-chrome-stable"
 
   tasks:
+    - setup:
+        gather_subset: min
+        gather_timeout: 180
+        filter:
+          - os_family
+
     - name: Remove browsers from RedHat-based systems (RHEL 6-9, Fedora)
       package:
         name: "{{ browser_packages }}"
