@@ -1,0 +1,34 @@
+---
+- name: Remove Firefox and Google Chrome
+  hosts: all
+  become: yes
+  vars:
+    browser_packages:
+      - "firefox"
+      - "google-chrome-stable"
+
+  tasks:
+    - name: Remove browsers from RedHat-based systems (RHEL 6-9, Fedora)
+      package:
+        name: "{{ browser_packages }}"
+        state: absent
+      when: ansible_facts['os_family'] == "RedHat"
+
+    - name: Remove browsers from SUSE systems
+      package:
+        name: "{{ browser_packages }}"
+        state: absent
+      when: ansible_facts['os_family'] == "Suse"
+
+    - name: Remove browsers from Debian/Ubuntu systems
+      apt:
+        name: "{{ browser_packages }}"
+        state: absent
+        purge: yes
+      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Autoremove unnecessary packages for Debian/Ubuntu
+      apt:
+        state: autoremove
+      when: ansible_facts['os_family'] == "Debian"
+
