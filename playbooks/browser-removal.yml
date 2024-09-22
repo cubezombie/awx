@@ -13,7 +13,7 @@
         gather_subset: min
         gather_timeout: 180
         filter:
-          - os_family
+          - "ansible_facts.os_family"
 
     - name: Remove browsers from RedHat-based systems (RHEL 6-9, Fedora)
       package:
