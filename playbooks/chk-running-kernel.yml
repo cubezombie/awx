@@ -28,11 +28,17 @@
       debug:
         msg: "GRUB menu entries: {{ grub_menu_entries.stdout_lines }}"
 
-    - name: Extract kernel version from menu entry based on default
+    - name: Check if GRUB default entry is valid
+      fail:
+        msg: "The GRUB default entry index {{ grub_default_entry.stdout }} is out of bounds. Check your GRUB configuration."
+      when: grub_default_entry.stdout | int >= grub_menu_entries.stdout_lines | length
+
+    - name: Extract kernel version from the default GRUB menu entry
       set_fact:
         grub_kernel: >-
           {% set entry = grub_menu_entries.stdout_lines[grub_default_entry.stdout | int] if grub_saved_mode.stdout != '' else grub_menu_entries.stdout_lines[0] %}
-          {{ entry | regex_search('vmlinuz-(\\S+)', '\\1') if entry | regex_search('vmlinuz-(\\S+)', '\\1') else 'Unknown' }}
+          {% set kernel_version = entry | regex_search('vmlinuz-(\\S+)') %}
+          {{ kernel_version if kernel_version is not none else 'Unknown' }}
 
     - name: Debug running kernel
       debug:
