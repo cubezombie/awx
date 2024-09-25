@@ -1,0 +1,61 @@
+---
+- name: Check running and installed kernels on RHEL 7
+  hosts: all
+  become: yes
+  tasks:
+
+    - name: Get the currently running kernel version
+      shell: uname -r
+      register: running_kernel
+
+    - name: Find the latest installed kernel version
+      shell: rpm -q --last kernel | awk 'NR==1{print $1}' | sed 's/kernel-//'
+      register: latest_installed_kernel
+
+    - name: Get GRUB's default saved kernel entry if available
+      shell: "grep 'GRUB_DEFAULT' /etc/default/grub | cut -d'=' -f2"
+      register: grub_default_entry
+
+    - name: Check if GRUB is set to use saved entry mode
+      shell: "grep 'GRUB_SAVEDEFAULT=true' /etc/default/grub || true"
+      register: grub_saved_mode
+
+    - name: Get the list of kernels from the grub.cfg file
+      shell: awk -F\' '/^menuentry / {print $2}' /boot/grub2/grub.cfg
+      register: grub_menu_entries
+
+    - name: Debug the list of GRUB menu entries
+      debug:
+        msg: "GRUB menu entries: {{ grub_menu_entries.stdout_lines }}"
+
+    - name: Set the kernel corresponding to the default entry
+      set_fact:
+        grub_kernel: >
+          {% if grub_saved_mode.stdout != '' %}
+            {{ grub_menu_entries.stdout_lines[grub_default_entry.stdout | int] | regex_search('vmlinuz-(.+)', '\\1') }}
+          {% else %}
+            {{ grub_menu_entries.stdout_lines[0] | regex_search('vmlinuz-(.+)', '\\1') }}
+          {% endif %}
+
+    - name: Debug running kernel
+      debug:
+        msg: "Running kernel version: {{ running_kernel.stdout }}"
+
+    - name: Debug latest installed kernel
+      debug:
+        msg: "Latest installed kernel version: {{ latest_installed_kernel.stdout }}"
+
+    - name: Debug GRUB default kernel
+      debug:
+        msg: "Kernel set in grub: {{ grub_kernel }}"
+
+    - name: Check if the running kernel is the latest installed
+      debug:
+        msg: >
+          The running kernel ({{ running_kernel.stdout }}) {{ 'is' if running_kernel.stdout == latest_installed_kernel.stdout else 'is NOT' }} the latest installed kernel ({{ latest_installed_kernel.stdout }}).
+
+    - name: Check if the latest installed kernel is set in GRUB
+      debug:
+        msg: >
+          The latest installed kernel ({{ latest_installed_kernel.stdout }}) {{ 'is' if grub_kernel == latest_installed_kernel.stdout else 'is NOT' }} set as the default kernel in grub.
+
