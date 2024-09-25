@@ -28,14 +28,11 @@
       debug:
         msg: "GRUB menu entries: {{ grub_menu_entries.stdout_lines }}"
 
-    - name: Set the kernel corresponding to the default entry
+    - name: Extract kernel version from menu entry based on default
       set_fact:
-        grub_kernel: >
-          {% if grub_saved_mode.stdout != '' %}
-            {{ grub_menu_entries.stdout_lines[grub_default_entry.stdout | int] | regex_search('vmlinuz-(.+)', '\\1') }}
-          {% else %}
-            {{ grub_menu_entries.stdout_lines[0] | regex_search('vmlinuz-(.+)', '\\1') }}
-          {% endif %}
+        grub_kernel: >-
+          {% set entry = grub_menu_entries.stdout_lines[grub_default_entry.stdout | int] if grub_saved_mode.stdout != '' else grub_menu_entries.stdout_lines[0] %}
+          {{ entry | regex_search('vmlinuz-(\\S+)', '\\1') if entry | regex_search('vmlinuz-(\\S+)', '\\1') else 'Unknown' }}
 
     - name: Debug running kernel
       debug:
